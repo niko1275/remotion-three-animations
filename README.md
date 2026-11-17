@@ -115,3 +115,7 @@ npm run render:efecto-foco
 ```
 
 El vídeo se guarda en `out/efecto-foco.mp4`.
+
+## Cerebro Tramposo · La acusación
+
+La composición de prueba **Shorts → LaAcusacion** abre el Short de falsas confesiones. Consulta el [tratamiento de las siete escenas y los controles de sincronización](docs/cerebro-tramposo/falsas-confesiones.md).

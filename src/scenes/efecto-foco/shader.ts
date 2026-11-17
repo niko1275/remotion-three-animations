@@ -1,16 +1,9 @@
+import {forms, hair, lighting} from './shaderParts';
+
 export const fragmentShader = `
 precision highp float;
 uniform vec2 R;uniform float F,T,SP,LT,WK;uniform vec3 CAM,TA,PP;
-mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
-float h1(float n){return fract(sin(n*91.3458)*47453.5453);}
-float h3(vec3 p){p=fract(p*0.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
-float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
-return mix(mix(mix(h3(i),h3(i+vec3(1,0,0)),f.x),mix(h3(i+vec3(0,1,0)),h3(i+vec3(1,1,0)),f.x),f.y),
-mix(mix(h3(i+vec3(0,0,1)),h3(i+vec3(1,0,1)),f.x),mix(h3(i+vec3(0,1,1)),h3(i+vec3(1,1,1)),f.x),f.y),f.z);}
-float rbox(vec3 p,vec3 c,vec3 h,float r){vec3 d=abs(p-c)-h+r;return length(max(d,0.))+min(max(d.x,max(d.y,d.z)),0.)-r;}
-float cap(vec3 p,vec3 a,vec3 b,float r){vec3 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h)-r;}
-float rect(vec2 p,vec2 c,vec2 h){vec2 d=abs(p-c)-h;return max(d.x,d.y);}
-const vec2 G0=vec2(-.1,.1);const float SX=.95,SZ=1.05;
+${forms}const vec2 G0=vec2(-.1,.1);const float SX=.95,SZ=1.05;
 const vec2 FD=vec2(.674,.739);
 const vec3 HV=vec3(0.,1.42,-.19),HP=vec3(0.,1.74,0.);
 float NOL=0.,br;vec3 PH;
@@ -18,8 +11,7 @@ vec2 cellOf(vec3 p){return vec2(clamp(floor((p.x-G0.x)/SX+.5),0.,3.),clamp(floor
 vec3 cellC(vec2 c){return vec3(G0.x+c.x*SX,0.,G0.y+c.y*SZ+.15);}
 vec2 faceDir(vec2 c){vec3 hc=cellC(c)+HV;float a=smoothstep(0.,.3,LT-.4*h1(c.x*7.+c.y*13.+1.));return normalize(mix(vec2(0.,-1.),normalize(PH.xz-hc.xz),a));}
 vec3 toFace(vec3 hp,vec2 f){vec2 b=-f;return vec3(hp.x*b.y-hp.z*b.x,hp.y,hp.x*b.x+hp.z*b.y);}
-float hairL(vec3 hp){return max(length(hp-vec3(0.,.03,.03))-.214,.02-dot(hp,normalize(vec3(0.,.55,.84))));}
-vec3 pl(vec3 p){return toFace(p-PP,FD);}
+${hair}vec3 pl(vec3 p){return toFace(p-PP,FD);}
 #define U(dd,ii) {float e_=dd;if(e_<d){d=e_;id=ii;}}
 vec2 map(vec3 p){float d=p.y,id=0.;
 U(min(min(p.x+2.6,3.4-p.x),min(p.z+2.8,5.4-p.z)),2.)
@@ -41,13 +33,7 @@ U(min(cap(x,vec3(0.,.62,0.),vec3(0.,1.3,0.),.2+br),min(cap(q,vec3(.27,1.3,0.),ve
 U(min(min(length(q-vec3(.3,.76,-.06))-.065,cap(x,vec3(0.,1.47,0.),vec3(0.,1.56,0.),.055)),length(x-HP)-.2),11.)
 U(hairL(x-HP),12.)}
 return vec2(d,id);}
-float shadow(vec3 p,vec3 lp){vec3 l=lp-p;float dm=length(l);l/=dm;float res=1.,t=.04;NOL=1.;for(int i=0;i<40;i++){float hh=map(p+l*t).x;res=min(res,8.*hh/t);t+=clamp(hh*.8,.03,.2);if(res<.02||t>dm-.05)break;}NOL=0.;return clamp(res,0.,1.);}
-vec3 nrm(vec3 p){vec2 e=vec2(.002,-.002);return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}
-vec3 ro,rt,up,fw;
-vec3 ray(vec2 fc){vec2 uv=(fc-.5*R)/R.x;return normalize(uv.x*rt+uv.y*up+1.6*fw);}
-vec2 trace(vec3 rd){float t=0.;for(int i=0;i<110;i++){vec2 m=map(ro+rd*t);if(m.x<.0012*t)return vec2(t,m.y);t+=m.x*.9;if(t>45.)break;}return vec2(45.,0.);}
-bool eye(vec3 hp,float w){hp=normalize(hp);float th=.98-.014*max(w,0.),ax=abs(hp.x);if(hp.z<0.&&abs(ax-.34)<.14&&abs(hp.y-(.2+.05*max(w,0.)+w*(.34-ax)*1.3))<.028)return true;return dot(hp,normalize(vec3(.4,-.06,-1.)))>th||dot(hp,normalize(vec3(-.4,-.06,-1.)))>th;}
-void main(){br=.006*sin(T*2.4);PH=PP+HP;
+${lighting}void main(){br=.006*sin(T*2.4);PH=PP+HP;
 ro=CAM;fw=normalize(TA-ro);rt=normalize(cross(fw,vec3(0,1,0)));up=cross(rt,fw);
 vec2 fc=gl_FragCoord.xy;vec3 rd=ray(fc);vec2 h=trace(rd);float lw=1.3,edge=0.;
 for(int i=0;i<4;i++){vec2 o=i==0?vec2(lw,0.):i==1?vec2(-lw,0.):i==2?vec2(0.,lw):vec2(0.,-lw);vec2 g=trace(ray(fc+o));

@@ -12,14 +12,14 @@ export const Box = ({p=[0,0,0], s=[1,1,1], c='#73847d', r=[0,0,0], ink=false}: {
 </group>;
 export const Cylinder = ({p=[0,0,0], top=.2, bottom=.2, h=1, c='#66776e', r=[0,0,0], ink=false}: {p?:V;top?:number;bottom?:number;h?:number;c?:string;r?:V;ink?:boolean}) => <mesh position={p} rotation={r} castShadow receiveShadow><cylinderGeometry args={[top,bottom,h,ink?6:12]}/>{ink?<meshToonMaterial color={c}/>:<meshStandardMaterial color={c} roughness={.85}/>}</mesh>;
 export const Plant = ({p,ink=false}: {p:V;ink?:boolean}) => <group position={p}><Cylinder top={.19} bottom={.12} h={.28} c="#ab8064" ink={ink}/>{[-1,0,1].map((n)=><mesh key={n} position={[n*.08,.34,0]} rotation={[0,0,n*-.3]} castShadow><coneGeometry args={[.1,.65,4]}/><meshToonMaterial color={n===0?'#8baf61':'#5f8149'}/></mesh>)}</group>;
-const Camera = () => {
+const Camera = ({workshop=false}: {workshop?:boolean}) => {
  const {camera}=useThree(); const f=useCurrentFrame();
- useLayoutEffect(()=>{camera.position.set(8-f*.001,7.5,10); camera.lookAt(0,1.3,0); camera.updateProjectionMatrix();},[camera,f]);
+ useLayoutEffect(()=>{camera.position.set(workshop?6:8-f*.001,workshop?9:7.5,workshop?8:10); camera.lookAt(0,workshop?1.65:1.3,workshop?-.65:0); camera.updateProjectionMatrix();},[camera,f,workshop]);
  return null;
 };
 export const Stage = ({children, workshop=false}: {children:ReactNode;workshop?:boolean}) => {
  const {width,height}=useVideoConfig();
- return <AbsoluteFill style={{background:workshop?'#202829':'#073b3c'}}><ThreeCanvas width={width} height={height} orthographic camera={{position:[8,7.5,10],zoom:105,near:.1,far:100}} shadows gl={{antialias:true}}><Camera/><color attach="background" args={[workshop?'#202829':'#073b3c']}/><ambientLight intensity={workshop?.65:.38}/><directionalLight position={[-3,8,4]} intensity={workshop?2:0.65} castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-normalBias={.025}/>{children}</ThreeCanvas><AbsoluteFill style={{pointerEvents:'none',background:'radial-gradient(ellipse at 50% 45%, transparent 38%, rgba(0,10,14,.48) 100%)'}}/></AbsoluteFill>;
+ return <AbsoluteFill style={{background:workshop?'#202829':'#073b3c'}}><ThreeCanvas width={width} height={height} orthographic camera={{position:[8,7.5,10],zoom:workshop?158:105,near:.1,far:100}} shadows gl={{antialias:true}}><Camera workshop={workshop}/><color attach="background" args={[workshop?'#202829':'#073b3c']}/><ambientLight intensity={workshop?.65:.38}/><directionalLight position={[-3,8,4]} intensity={workshop?2:0.65} castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-normalBias={.025}/>{children}</ThreeCanvas><AbsoluteFill style={{pointerEvents:'none',background:'radial-gradient(ellipse at 50% 45%, transparent 38%, rgba(0,10,14,.48) 100%)'}}/></AbsoluteFill>;
 };
 export const Room = ({ink=false}: {ink?:boolean}) => <>
 <Box p={[0,-.16,0]} s={[7,.3,6]} c={ink?'#414b49':'#183d3c'} ink={ink}/>

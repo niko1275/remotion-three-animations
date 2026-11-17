@@ -36,9 +36,9 @@ Revisa los requisitos de licencia de Remotion antes del uso en producción: http
 En Studio, abre la carpeta **Dioramas**:
 
 - **Hospital**: habitación low-poly isométrica, cama, suero, cortinas en movimiento, lámpara cálida, lavabo, reloj, silla y polvo suspendido. Paleta verde y luz nocturna.
-- **Workshop**: taller ilustrado con materiales toon, contornos en muebles, dos personajes geométricos con brazos animados, plantas, cuaderno y bombilla SVG pulsante.
+- **Workshop**: taller ilustrado con materiales toon, contornos en muebles, dos personajes de malla procedural con abrigos, bolsillos, cabello por mechones y brazos articulados, plantas, cuaderno y bombilla SVG pulsante.
 
-Ambas composiciones duran 8 segundos a 30 fps, en 1280 × 960. Son interpretaciones construidas con geometría procedural, sin modelos externos; los personajes son estilizados y simples. No son reproducciones exactas de las imágenes.
+Ambas composiciones duran 8 segundos a 30 fps, en 1280 × 960. Son interpretaciones construidas con geometría procedural, sin modelos externos; los personajes son estilizados y están modelados mediante secciones elípticas. No son reproducciones exactas de las imágenes.
 
 ```sh
 npm run render:hospital
@@ -52,7 +52,7 @@ npm run still:hospital
 npm run still:workshop
 ```
 
-Los resultados quedan en `out/`. Edita `src/scenes/Hospital.tsx` y `src/scenes/Workshop.tsx`; las piezas y la cámara compartidas están en `src/scenes/Kit.tsx`. Todas las animaciones dependen del fotograma de Remotion.
+Los resultados quedan en `out/`. Edita `src/scenes/Hospital.tsx` y `src/scenes/Workshop.tsx`; el modelado de personajes está en `src/scenes/Characters.tsx`; las piezas y la cámara compartidas están en `src/scenes/Kit.tsx`. Todas las animaciones dependen del fotograma de Remotion.
 
 Para actualizar una copia existente en Windows, entra primero en la carpeta del repositorio y ejecuta `git pull`, `npm ci` y `npm start`.
 
@@ -70,3 +70,5 @@ npm run render:workshop -- --gl=swangle
 ```
 
 Validación: TypeScript, bundle y una imagen renderizada de cada composición con Chromium y `swangle`.
+
+El taller usa un encuadre cercano propio. El adulto escribe con un lápiz mientras el niño observa con una mano cerca de la cara. Las mallas incluyen siluetas de abrigo, solapas, bolsillos, pantalones, zapatos y cabello, con contornos de silueta.

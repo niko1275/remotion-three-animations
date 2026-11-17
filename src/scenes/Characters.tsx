@@ -18,7 +18,7 @@ function silhouette(rings: Ring[], sides=12) {
  for(let i=0;i<positions.count;i+=3){const x=positions.getX(i),y=positions.getY(i),z=positions.getZ(i);const value=.96+.035*Math.sin(x*7.1+y*6.3+z*11.7);for(let j=0;j<3;j++)colors.push(value,value*(1.+.012*Math.sin(y*5.)),value*.985);}
  painted.setAttribute('color',new Float32BufferAttribute(colors,3));return painted;
 }
-function Sculpt({rings,color,p=[0,0,0],r=[0,0,0]}:{rings:Ring[];color:string;p?:V;r?:V}) {
+export function Sculpt({rings,color,p=[0,0,0],r=[0,0,0]}:{rings:Ring[];color:string;p?:V;r?:V}) {
   const key=JSON.stringify(rings);
   const geometry=useMemo(()=>silhouette(rings),[key]);
   useEffect(()=>()=>geometry.dispose(),[geometry]);
@@ -29,7 +29,7 @@ function Limb({a,b,radius,color}:{a:V;b:V;radius:number;color:string}) {
  const q=new Quaternion().setFromUnitVectors(new Vector3(0,1,0),direction.clone().normalize());
  return <group position={start.add(end).multiplyScalar(.5)} quaternion={q}><Sculpt rings={[[-direction.length()/2,radius*.75,radius*.8],[0,radius,radius],[direction.length()/2,radius*.85,radius*.85]]} color={color}/></group>;
 }
-const Ellipsoid=({p,s,c}:{p:V;s:V;c:string})=><mesh position={p} scale={s} castShadow><sphereGeometry args={[1,12,8]}/><PaintedMaterial color={c}/></mesh>;
+export const Ellipsoid=({p,s,c}:{p:V;s:V;c:string})=><mesh position={p} scale={s} castShadow><sphereGeometry args={[1,12,8]}/><PaintedMaterial color={c}/></mesh>;
 export const Character=({p,child=false}:{p:V;child?:boolean})=>{
  const frame=useCurrentFrame(); const t=frame/30;
  // Smooth transitions between writing, explaining, listening and returning to work.

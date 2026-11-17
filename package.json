@@ -10,7 +10,11 @@
     "render:hospital": "remotion render src/index.ts Hospital out/hospital.mp4 --gl=angle",
     "render:workshop": "remotion render src/index.ts Workshop out/workshop.mp4 --gl=angle",
     "still:hospital": "remotion still src/index.ts Hospital out/hospital.png --frame=90 --gl=angle",
-    "still:workshop": "remotion still src/index.ts Workshop out/workshop.png --frame=90 --gl=angle"
+    "still:workshop": "remotion still src/index.ts Workshop out/workshop.png --frame=90 --gl=angle",
+    "render:hospital-story": "remotion render src/index.ts HospitalStory out/hospital-story.mp4 --gl=angle",
+    "still:hospital-story": "remotion still src/index.ts HospitalStory out/hospital-story.png --frame=300 --gl=angle",
+    "render:protagonist": "remotion render src/index.ts ProtagonistActions out/protagonist-actions.mp4 --gl=angle",
+    "test:animations": "node --experimental-strip-types --test tests/character-animations.test.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",

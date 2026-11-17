@@ -89,3 +89,13 @@ La muestra contiene los 240 fotogramas de la composición. `npm run render:works
 ## Dirección artística
 
 El taller incorpora luz lateral cálida y ambiente frío, oclusión de contacto analítica, sombreado pintado con rampa toon suave, siluetas oscuras, ropa con variaciones por cara y un encuadre más cercano. Consulta [las seis fases con fotogramas de prueba](docs/art-direction/README.md) para ver los cambios y las limitaciones técnicas.
+
+## Hospital para Shorts verticales
+
+Se añadieron **HospitalStory** (15 segundos, 1080 × 1920) y **ProtagonistActions** a la carpeta **Shorts** de Studio: protagonista articulado, ocho acciones, habitación modular y cuatro modos de luz.
+
+[Ver arquitectura, acciones, iluminación y comandos](docs/hospital-system/README.md)
+
+```sh
+npm run render:hospital-story
+```

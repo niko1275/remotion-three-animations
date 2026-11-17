@@ -22,11 +22,20 @@ Fuentes del experimento y las cifras. [Kassin y Kiechel (1996)](https://journals
 
 ## Revisión de la primera escena
 
-Abre **Shorts → LaAcusacion** en Remotion Studio. La composición dura aproximadamente 12,1 segundos, en 540 × 960 a 30 fps.
+Abre **Shorts → LaAcusacion** en Remotion Studio. La composición dura 11,8 segundos, en 540 × 960 a 30 fps.
 
 ```sh
 npm start
 npm run render:la-acusacion
 ```
 
-El render guarda un MP4 sin audio en `out/la-acusacion.mp4`. El arreglo `shots` de `src/scenes/la-acusacion/timeline.ts` contiene la duración en segundos, la cámara y el diálogo de cada plano. Cada intervención tiene un hablante, un texto, un inicio relativo al plano y una duración. Ajusta esos valores con el audio definitivo. La duración de la composición se calcula a partir de los planos. Los movimientos y la aproximación de boca de la prueba usan el fotograma de Remotion y las ventanas de diálogo.
+El render guarda un MP4 sin audio en `out/la-acusacion.mp4`.
+
+| Plano | Intervalo | Diálogo |
+| --- | --- | --- |
+| General | 0–42 | Silencio |
+| Investigador | 42–135 | 53–121 |
+| Estudiante | 135–231 | 149–221 |
+| Sobre el hombro del investigador | 231–354 | 244–327 |
+
+Los intervalos están en fotogramas a 30 fps, con el final excluido. Edita `shots` en `src/scenes/la-acusacion/timeline.ts` para ajustar la duración de cada plano y el texto, inicio y duración de las intervenciones. El inicio de cada intervención se mide desde el corte. Las pausas de articulación se miden desde el inicio de la intervención. `accusationCues` expone las posiciones absolutas y se actualiza al cambiar las duraciones. Úsalas como puntos de entrada al montar las voces definitivas. El movimiento de boca es provisional y los rótulos permanecen visibles durante las pausas dentro de una frase.

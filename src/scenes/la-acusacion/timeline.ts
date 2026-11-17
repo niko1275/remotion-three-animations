@@ -1,72 +1,120 @@
 import {smooth} from '../../components/characters/CharacterAnimations';
 
 type Point = [number, number, number];
-type Beat = {at: number; text: string} & (
-  {speaker: 'interrogador' | 'protagonista'; duration: number} |
-  {speaker: 'silencio'; duration: 0}
-);
+type Dialogue = {
+  speaker: 'interrogador' | 'protagonista';
+  text: string;
+  offset: number;
+  frames: number;
+  pause?: [from: number, to: number];
+};
 type Shot = {
-  duration: number;
+  id: 'general' | 'investigador' | 'estudiante' | 'hombro';
+  frames: number;
   camera: Point;
   target: Point;
-  push: number;
-  beat: Beat;
-  pose: 'espera' | 'acusa' | 'niega' | 'presiona';
+  push?: number;
+  dialogue?: Dialogue;
 };
 
+// At 30 fps, dialogue offsets are relative to the cut and pauses to the cue.
+export const accusationFps = 30;
 export const shots: Shot[] = [
-  {duration: 1.7, camera: [4.73, 1.86, .40], target: [0, 1.18, 0], push: .035,
-    beat: {speaker: 'silencio', at: 0, duration: 0, text: ''}, pose: 'espera'},
-  {duration: 3.05, camera: [.61, 1.57, .53], target: [0, 1.32, -.92], push: .065,
-    beat: {speaker: 'interrogador', at: .38, duration: 2.28, text: 'Fuiste tú. Presionaste la tecla.'}, pose: 'acusa'},
-  {duration: 3.2, camera: [.58, 1.54, -.54], target: [0, 1.32, .99], push: .04,
-    beat: {speaker: 'protagonista', at: .48, duration: 2.38, text: 'No. Estoy seguro de que no fui yo.'}, pose: 'niega'},
-  {duration: 4.1, camera: [.43, 1.59, -1.86], target: [-.04, 1.28, 1.02], push: .035,
-    beat: {speaker: 'interrogador', at: .42, duration: 2.76, text: 'Entonces, ¿por qué ella dice que te vio hacerlo?'}, pose: 'presiona'},
+  {id: 'general', frames: 42, camera: [4.73, 1.86, .40], target: [0, 1.18, 0]},
+  {id: 'investigador', frames: 93, camera: [.61, 1.57, .53], target: [0, 1.32, -.92],
+    dialogue: {speaker: 'interrogador', offset: 11, frames: 68, pause: [19, 25],
+      text: 'Fuiste tú. Presionaste la tecla.'}},
+  {id: 'estudiante', frames: 96, camera: [.58, 1.54, -.54], target: [0, 1.32, .99],
+    dialogue: {speaker: 'protagonista', offset: 14, frames: 72, pause: [7, 14],
+      text: 'No. Estoy seguro de que no fui yo.'}},
+  {id: 'hombro', frames: 123, camera: [.43, 1.59, -1.86], target: [-.04, 1.28, 1.02], push: .035,
+    dialogue: {speaker: 'interrogador', offset: 13, frames: 83,
+      text: 'Entonces, ¿por qué ella dice que te vio hacerlo?'}},
 ];
 
-export const accusationFps = 30;
-// Round each cut once so the registered duration and frame lookup agree after edits.
 let nextCut = 0;
-const shotsInFrames = shots.map(shot => {
-  const frames = Math.max(1, Math.round(shot.duration * accusationFps));
+const edit = shots.map(shot => {
+  const {dialogue} = shot;
+  if (!Number.isInteger(shot.frames) || shot.frames < 1) {
+    throw new Error(`Duración de plano inválida: ${shot.id}`);
+  }
+  if (dialogue && (!Number.isInteger(dialogue.offset) || dialogue.offset < 0
+    || !Number.isInteger(dialogue.frames) || dialogue.frames < 1
+    || dialogue.offset + dialogue.frames > shot.frames)) {
+    throw new Error(`El diálogo queda fuera del plano: ${shot.id}`);
+  }
+  if (dialogue?.pause) {
+    const [from, to] = dialogue.pause;
+    if (!Number.isInteger(from) || !Number.isInteger(to) || from < 0 || to <= from || to > dialogue.frames) {
+      throw new Error(`Pausa de diálogo inválida: ${shot.id}`);
+    }
+  }
+
   const start = nextCut;
-  nextCut += frames;
-  return {...shot, start, frames};
+  nextCut += shot.frames;
+  const cue = dialogue && {
+    ...dialogue,
+    start: start + dialogue.offset,
+    end: start + dialogue.offset + dialogue.frames,
+  };
+  return {...shot, start, end: nextCut, cue};
 });
+
 export const accusationFrames = nextCut;
+// Absolute frame positions for an editor or a future audio Sequence.
+export const accusationCues = edit.flatMap(({id, cue}) => cue ? [{shot: id, ...cue}] : []);
+
+function articulation(frame: number, start: number, end: number) {
+  if (frame < start || frame >= end) return 0;
+  const ease = smooth((frame - start) / 3) * smooth((end - frame) / 3);
+  return ease * Math.pow(Math.abs(Math.sin((frame - start) * .43)), 1.4) * .63;
+}
 
 export function accusationFrame(frame: number) {
   const current = Math.max(0, Math.min(accusationFrames - 1, frame));
-  const shot = shotsInFrames.find(shot => current < shot.start + shot.frames)!;
+  const shot = edit.find(({end}) => current < end)!;
   const elapsed = current - shot.start;
-  const t = elapsed / accusationFps;
-  const progress = smooth(elapsed / Math.max(1, shot.frames - 1));
-  const phase = (a: number, b: number) => smooth((t - a) / (b - a));
-  const voiceTime = t - shot.beat.at;
-  const speaking = voiceTime >= 0 && voiceTime < shot.beat.duration;
-  const syllable = speaking ? Math.pow(Math.abs(Math.sin(voiceTime * 15)), 1.4) : 0;
-  const accusing = shot.pose === 'acusa';
-  const denying = shot.pose === 'niega';
-  const pressing = shot.pose === 'presiona';
-  const anticipation = shot.pose === 'espera' ? .09 * progress : .09;
-  const plant = accusing ? phase(.10, .74) : denying || pressing ? 1 : 0;
-  const emphasis = pressing ? phase(.46, .84) * (1 - phase(2.70, 3.44)) : 0;
-  const lean = .12 + anticipation + .10 * plant + .025 * emphasis;
-  const recoil = denying ? phase(.08, .57) : pressing ? 1 - .12 * phase(.2, 2.6) : 0;
-  const shake = denying ? Math.sin((voiceTime - .04) * 10) * .14 * phase(.25, .54) * (1 - phase(1.10, 1.67)) : 0;
-  const gaze = pressing ? .20 * phase(1.1, 2.45) + .056 * phase(2.9, 3.7) : 0;
-  const breath = Math.sin(current / accusationFps * 2.05);
-  const camera = shot.camera.map((value, i) =>
-    value + (shot.target[i] - value) * shot.push * progress) as Point;
+  const progress = elapsed / Math.max(1, shot.frames - 1);
+  const phase = (a: number, b: number) => smooth((progress - a) / (b - a));
+  const {cue} = shot;
+  const speaking = cue && current >= cue.start && current < cue.end;
+  const pause = cue?.pause && cue.pause.map(offset => cue.start + offset);
+  const mouth = !cue ? 0 : pause && current < pause[1]
+    ? articulation(current, cue.start, pause[0])
+    : articulation(current, pause?.[1] ?? cue.start, cue.end);
+
+  const wide = shot.id === 'general';
+  const accusation = shot.id === 'investigador';
+  const denial = shot.id === 'estudiante';
+  const overShoulder = shot.id === 'hombro';
+  const setHands = wide ? 0 : accusation ? phase(.06, .28) : 1;
+  const lean = .12 + .09 * (wide ? phase(.28, 1) : 1) + .10 * setHands;
+  const recoil = denial ? phase(.08, .30) : overShoulder ? 1 - .11 * phase(.40, .72) : 0;
+  const shake = denial ? .085 * (phase(.10, .19) - 1.65 * phase(.20, .31) + .65 * phase(.32, .45)) : 0;
+  const pressure = overShoulder ? phase(.16, .34) * (1 - phase(.54, .75)) : 0;
+  const gaze = overShoulder ? .19 * phase(.40, .70) + .05 * phase(.74, .94) : 0;
+  const time = current / accusationFps;
+  const breath = Math.sin(time * 2.05);
+  const push = (shot.push ?? 0) * phase(.12, 1);
+  const camera = shot.camera.map((value, i) => value + (shot.target[i] - value) * push) as Point;
 
   return {
-    time: current / accusationFps,
+    time,
     camera,
     target: shot.target,
-    caption: speaking ? shot.beat.text : '',
-    interrogator: [lean + .006 * breath, .014 * breath, -.87 * lean + .025 * emphasis, shot.beat.speaker === 'interrogador' ? syllable : 0] as const,
-    protagonist: [-.035 - .175 * recoil + .009 * breath, shake + .014 * breath, .035 + gaze - .06 * recoil, shot.beat.speaker === 'protagonista' ? syllable : 0] as const,
-    hands: [.20 + .60 * plant + .10 * emphasis, .22 + .74 * recoil] as const,
+    caption: speaking ? cue.text : '',
+    interrogator: [
+      lean + .006 * breath + .018 * pressure,
+      .012 * breath,
+      -.87 * lean + .018 * pressure,
+      cue?.speaker === 'interrogador' ? mouth : 0,
+    ] as const,
+    protagonist: [
+      -.035 - .175 * recoil + .008 * breath,
+      shake + .011 * breath,
+      .035 + gaze - .06 * recoil,
+      cue?.speaker === 'protagonista' ? mouth : 0,
+    ] as const,
+    hands: [.20 + .60 * setHands + .07 * pressure, .22 + .74 * recoil] as const,
   };
 }

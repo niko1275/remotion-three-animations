@@ -1,8 +1,8 @@
-import {AbsoluteFill, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
 import {Box,Cylinder,Plant,Room,Stage} from './Kit';
 import {Character} from './Characters';
 export const Workshop = () => {
- const f=useCurrentFrame(); const pulse=1+Math.sin(f*.06)*.035;
+ const f=useCurrentFrame(); const idea=interpolate(f,[0,85,105,155,185,239],[.18,.18,1,1,.18,.18],{extrapolateLeft:'clamp',extrapolateRight:'clamp'}); const pulse=1+idea*.12+Math.sin(f*.09)*.025;
  return <><Stage workshop><Room ink/>
  {Array.from({length:7},(_,x)=>Array.from({length:6},(_,z)=><Box key={`${x}-${z}`} p={[-3+x,.015,-2.5+z]} s={[.975,.025,.975]} c={(x+z)%2?'#737f76':'#89938a'} ink/>))}
  {/* Desk and shelves */}
@@ -28,7 +28,7 @@ export const Workshop = () => {
  <Character p={[.65,0,-.12]}/><Character p={[-1.25,0,-.15]} child/>
  <pointLight position={[-1.8,2,1]} color="#ffbd59" intensity={5} distance={4}/>
  </Stage>
- <AbsoluteFill style={{pointerEvents:'none'}}><div style={{position:'absolute',left:'13%',top:'23%',transform:`scale(${pulse})`,width:120,height:120,borderRadius:'50%',background:'radial-gradient(circle, #ffbf4560, #f79b2220 60%, transparent 72%)',filter:'drop-shadow(0 0 18px #ffab32)'}}>
+ <AbsoluteFill style={{pointerEvents:'none'}}><div style={{position:'absolute',left:'13%',top:'23%',transform:`scale(${pulse})`,opacity:.4+idea*.6,width:120,height:120,borderRadius:'50%',background:'radial-gradient(circle, #ffbf4560, #f79b2220 60%, transparent 72%)',filter:'drop-shadow(0 0 18px #ffab32)'}}>
  <svg viewBox="0 0 120 120" width="120" height="120" fill="none" stroke="#fff3bd" strokeWidth="3.5" strokeLinecap="round"><circle cx="60" cy="60" r="48" stroke="#bd7c2d" strokeWidth="2" opacity=".6"/><path d="M47 63 C27 39 47 22 60 25 C80 23 92 43 74 63 L72 76 H49 Z M50 82 H71 M53 89 H68 M58 70 L52 45 L60 51 L68 44 L64 70"/>{Array.from({length:8},(_,i)=>{const a=i*Math.PI/4;return <path key={i} d={`M${60+Math.cos(a)*38} ${48+Math.sin(a)*38} l${Math.cos(a)*7} ${Math.sin(a)*7}`}/>;})}</svg>
  </div></AbsoluteFill></>;
 };

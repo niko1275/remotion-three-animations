@@ -72,3 +72,16 @@ npm run render:workshop -- --gl=swangle
 Validación: TypeScript, bundle y una imagen renderizada de cada composición con Chromium y `swangle`.
 
 El taller usa un encuadre cercano propio. El adulto escribe con un lápiz mientras el niño observa con una mano cerca de la cara. Las mallas incluyen siluetas de abrigo, solapas, bolsillos, pantalones, zapatos y cabello, con contornos de silueta.
+
+### Secuencia de personajes (Workshop)
+
+- 0–2,2 s: el adulto escribe con el lápiz y el niño observa.
+- 2,2–3,2 s: el adulto levanta la mano y gira la cabeza para explicar; la bombilla se ilumina.
+- 2,7–6,2 s: el niño baja la mano, mira al adulto y asiente.
+- 4,5–5,5 s: el adulto vuelve suavemente al cuaderno y retoma la escritura.
+
+Pulsa reproducir en Studio para ver la secuencia completa de 8 segundos. Puedes recorrer fotogramas en cualquier orden: las poses se calculan a partir del fotograma, sin depender del reloj. Los tiempos y poses están en `src/scenes/Characters.tsx`.
+
+[Descargar vídeo de muestra de la secuencia (MP4, 640 × 480)](docs/previews/workshop-animation.mp4)
+
+La muestra contiene los 240 fotogramas de la composición. `npm run render:workshop` exporta la versión de 1280 × 960.

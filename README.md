@@ -30,3 +30,43 @@ Los movimientos usan `useCurrentFrame()` para reproducir cada fotograma de forma
 
 Revisa los requisitos de licencia de Remotion antes del uso en producción: https://www.remotion.dev/docs/license
 
+
+## Dioramas de las referencias
+
+En Studio, abre la carpeta **Dioramas**:
+
+- **Hospital**: habitación low-poly isométrica, cama, suero, cortinas en movimiento, lámpara cálida, lavabo, reloj, silla y polvo suspendido. Paleta verde y luz nocturna.
+- **Workshop**: taller ilustrado con materiales toon, contornos en muebles, dos personajes geométricos con brazos animados, plantas, cuaderno y bombilla SVG pulsante.
+
+Ambas composiciones duran 8 segundos a 30 fps, en 1280 × 960. Son interpretaciones construidas con geometría procedural, sin modelos externos; los personajes son estilizados y simples. No son reproducciones exactas de las imágenes.
+
+```sh
+npm run render:hospital
+npm run render:workshop
+```
+
+Para exportar imágenes de muestra:
+
+```sh
+npm run still:hospital
+npm run still:workshop
+```
+
+Los resultados quedan en `out/`. Edita `src/scenes/Hospital.tsx` y `src/scenes/Workshop.tsx`; las piezas y la cámara compartidas están en `src/scenes/Kit.tsx`. Todas las animaciones dependen del fotograma de Remotion.
+
+Para actualizar una copia existente en Windows, entra primero en la carpeta del repositorio y ejecuta `git pull`, `npm ci` y `npm start`.
+
+### Vistas de muestra
+
+![Hospital isométrico](docs/previews/hospital.png)
+
+![Taller ilustrado](docs/previews/workshop.png)
+
+Si ANGLE no puede crear un contexto WebGL, puedes usar renderizado por software:
+
+```sh
+npm run render:hospital -- --gl=swangle
+npm run render:workshop -- --gl=swangle
+```
+
+Validación: TypeScript, bundle y una imagen renderizada de cada composición con Chromium y `swangle`.

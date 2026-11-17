@@ -6,7 +6,11 @@
     "start": "remotion studio src/index.ts",
     "typecheck": "tsc --noEmit",
     "build": "remotion bundle src/index.ts",
-    "render": "remotion render src/index.ts Orbit out/orbit.mp4 --gl=angle"
+    "render": "remotion render src/index.ts Orbit out/orbit.mp4 --gl=angle",
+    "render:hospital": "remotion render src/index.ts Hospital out/hospital.mp4 --gl=angle",
+    "render:workshop": "remotion render src/index.ts Workshop out/workshop.mp4 --gl=angle",
+    "still:hospital": "remotion still src/index.ts Hospital out/hospital.png --frame=90 --gl=angle",
+    "still:workshop": "remotion still src/index.ts Workshop out/workshop.png --frame=90 --gl=angle"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",

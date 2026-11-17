@@ -4,7 +4,7 @@ import {Character} from './Characters';
 export const Workshop = () => {
  const f=useCurrentFrame(); const idea=interpolate(f,[0,85,105,155,185,239],[.18,.18,1,1,.18,.18],{extrapolateLeft:'clamp',extrapolateRight:'clamp'}); const pulse=1+idea*.12+Math.sin(f*.09)*.025;
  return <><Stage workshop><Room ink/>
- {Array.from({length:7},(_,x)=>Array.from({length:6},(_,z)=><Box key={`${x}-${z}`} p={[-3+x,.015,-2.5+z]} s={[.975,.025,.975]} c={(x+z)%2?'#737f76':'#89938a'} ink/>))}
+ {Array.from({length:7},(_,x)=>Array.from({length:6},(_,z)=><Box key={`${x}-${z}`} p={[-3+x,.015,-2.5+z]} s={[.975,.025,.975]} c={(x+z)%2?'#737f76':'#7d887e'} ink outline={false}/>))}
  {/* Desk and shelves */}
  <Box p={[.45,1.5,-1.35]} s={[4.65,.16,2.1]} c="#a8c7ba" ink/>
  {[-1.65,2.5].map(x=>[-2.1,-.6].map(z=><Box key={`${x}${z}`} p={[x,.75,z]} s={[.12,1.5,.12]} c="#616e60" ink/>))}

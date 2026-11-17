@@ -85,3 +85,7 @@ Pulsa reproducir en Studio para ver la secuencia completa de 8 segundos. Puedes 
 [Descargar vídeo de muestra de la secuencia (MP4, 640 × 480)](docs/previews/workshop-animation.mp4)
 
 La muestra contiene los 240 fotogramas de la composición. `npm run render:workshop` exporta la versión de 1280 × 960.
+
+## Dirección artística
+
+El taller incorpora luz lateral cálida y ambiente frío, oclusión de contacto analítica, sombreado pintado con rampa toon suave, siluetas oscuras, ropa con variaciones por cara y un encuadre más cercano. Consulta [las seis fases con fotogramas de prueba](docs/art-direction/README.md) para ver los cambios y las limitaciones técnicas.

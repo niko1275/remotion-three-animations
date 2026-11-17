@@ -105,3 +105,13 @@ npm run render:hospital-story
 Nueva carpeta **GraphicNovel** en Studio con **GraphicProtagonist** y **GraphicPortrait**. Incluye un modelo GLB nuevo, archivo Blender editable, material cel y renders reales para revisar el diseño antes de adaptarlo al hospital.
 
 [Ver el estudio, las vistas y los archivos del asset](docs/graphic-protagonist/README.md)
+
+## Efecto Foco
+
+En Studio, abre **Shorts → EfectoFoco**. Dura 7 segundos a 30 fps en 540 × 960, sin audio. La escena conserva el shader, el grano, los tres planos y los rótulos del artefacto de Claude. Edita los cortes, la cámara y los rótulos en `src/scenes/efecto-foco/timeline.ts`.
+
+```sh
+npm run render:efecto-foco
+```
+
+El vídeo se guarda en `out/efecto-foco.mp4`.

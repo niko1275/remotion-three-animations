@@ -7,6 +7,7 @@
     "typecheck": "tsc --noEmit",
     "build": "remotion bundle src/index.ts",
     "render": "remotion render src/index.ts Orbit out/orbit.mp4 --gl=angle",
+    "render:efecto-foco": "remotion render src/index.ts EfectoFoco out/efecto-foco.mp4 --gl=swangle",
     "render:hospital": "remotion render src/index.ts Hospital out/hospital.mp4 --gl=angle",
     "render:workshop": "remotion render src/index.ts Workshop out/workshop.mp4 --gl=angle",
     "still:hospital": "remotion still src/index.ts Hospital out/hospital.png --frame=90 --gl=angle",

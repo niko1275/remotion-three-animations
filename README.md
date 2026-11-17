@@ -99,3 +99,9 @@ Se añadieron **HospitalStory** (15 segundos, 1080 × 1920) y **ProtagonistActio
 ```sh
 npm run render:hospital-story
 ```
+
+## Estudio de protagonista · Novela gráfica B
+
+Nueva carpeta **GraphicNovel** en Studio con **GraphicProtagonist** y **GraphicPortrait**. Incluye un modelo GLB nuevo, archivo Blender editable, material cel y renders reales para revisar el diseño antes de adaptarlo al hospital.
+
+[Ver el estudio, las vistas y los archivos del asset](docs/graphic-protagonist/README.md)

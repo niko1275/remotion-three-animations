@@ -14,7 +14,10 @@
     "render:hospital-story": "remotion render src/index.ts HospitalStory out/hospital-story.mp4 --gl=angle",
     "still:hospital-story": "remotion still src/index.ts HospitalStory out/hospital-story.png --frame=300 --gl=angle",
     "render:protagonist": "remotion render src/index.ts ProtagonistActions out/protagonist-actions.mp4 --gl=angle",
-    "test:animations": "node --experimental-strip-types --test tests/character-animations.test.mjs"
+    "test:animations": "node --experimental-strip-types --test tests/character-animations.test.mjs",
+    "still:graphic": "remotion still src/index.ts GraphicProtagonist out/graphic-protagonist.png --frame=30 --gl=angle",
+    "render:graphic": "remotion render src/index.ts GraphicProtagonist out/graphic-protagonist.mp4 --gl=angle",
+    "test:graphic": "node --test tests/graphic-asset.test.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",

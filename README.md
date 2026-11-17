@@ -4,7 +4,7 @@ Base en React y TypeScript para crear vídeos 3D. Incluye Orbit: 6 segundos, 192
 
 ## Requisitos y uso
 
-Node.js 22 o superior y npm.
+Node.js 18.20.4 o superior y npm.
 
 ```sh
 npm ci

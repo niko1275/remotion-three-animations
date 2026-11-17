@@ -61,21 +61,32 @@ vec2 actor(vec3 p, bool protagonist) {
 
   for (int i=0;i<2;i++) {
     float side = i == 0 ? -1. : 1.;
-    vec3 shoulder = vec3(side*.23,1.02,-.13)-HIP;
+    float shoulderWidth = protagonist ? .23 - .038 * gesture : .23;
+    vec3 shoulder = vec3(side*shoulderWidth,1.02,-.13)-HIP;
     shoulder.yz = rot(pose.x)*shoulder.yz;
     shoulder += HIP;
-    float reach = i == 0 ? gesture : gesture*.72;
+    float reach = i == 0 ? gesture : gesture*.84;
     vec3 elbow = protagonist
-      ? mix(vec3(side*.28,.92,-.285),vec3(side*.275,.83,-.16),reach)
-      : mix(vec3(side*.28,.90,-.24),vec3(side*.27,.973,-.46),reach);
+      ? mix(vec3(side*.28,.92,-.285),vec3(side*.205,.86,-.20),reach)
+      : mix(vec3(side*.28,.90,-.24),vec3(side*.285,.966,-.39),reach);
     vec3 hand = protagonist
-      ? mix(vec3(side*.16,1.012,-.49),vec3(side*.17,.87,-.24),reach)
-      : mix(vec3(side*.16,1.012,-.49),vec3(side*.14,1.02,-.69),reach);
-    hand.y += .007*sin(T*2. + side);
+      ? mix(vec3(side*.16,1.012,-.49),vec3(side*.094,.913,-.27),reach)
+      : mix(vec3(side*.16,1.012,-.49),vec3(side*.155,1.011,-.63),reach);
+    // The investigator keeps both hands down. The student draws the hands together.
+    if (protagonist) {
+      hand.x -= side * (.005+.005*sin(T*3.6+side)) * gesture;
+      hand.y += .006*sin(T*2.1+side);
+    } else {
+      hand.z += .003*sin(T*2.+side);
+    }
     NEAR(min(cap(p,shoulder,elbow,.06),cap(p,elbow,hand,.055)),4.+offset)
     NEAR(length(p-hand)-.062,9.+offset)
   }
   return vec2(d,id);
+}
+const vec2 FORM_CENTER = vec2(-.11,-.13);
+vec2 formSpace(vec2 xz) {
+  return rot(.12) * (xz-FORM_CENTER);
 }
 vec2 map(vec3 p) {
   float d = p.y, id = 0.;
@@ -85,7 +96,7 @@ vec2 map(vec3 p) {
   NEAR(rbox(p,vec3(0.,2.53,0.),vec3(.25,.095,.22),.07),3.)
   NEAR(rbox(p,vec3(0.,2.445,0.),vec3(.205,.012,.175),.01),17.)
   NEAR(rbox(p,vec3(0.,2.77,0.),vec3(.016,.22,.016),.006),3.)
-  NEAR(rbox(p,vec3(-.10,.96,-.23),vec3(.126,.006,.16),.004),16.)
+  NEAR(rbox(vec3(formSpace(p.xz).x,p.y,formSpace(p.xz).y),vec3(0.,.96,0.),vec3(.126,.006,.16),.004),16.)
   for (int i=0;i<2;i++) {
     bool protagonist = i == 0;
     vec3 v = actorSpace(p,protagonist);
@@ -121,7 +132,19 @@ vec3 palette(vec3 p, float id, vec3 ink) {
   if (id == 6. || id == 12.) return vec3(.30,.30,.37);
   if (id == 8.) return vec3(.42,.27,.17);
   if (id == 14.) return vec3(.30,.20,.14);
-  if (id == 16.) return vec3(.96,.95,.90);
+  if (id == 16.) {
+    vec2 paper = formSpace(p.xz);
+    vec3 stock = vec3(.92,.90,.82);
+    vec3 printColor = vec3(.43,.41,.37);
+    // A printed header, ruled fields and a single signature line.
+    if (rect(paper,vec2(-.047,-.111),vec2(.060,.010)) < 0.) return printColor;
+    for (int line=0;line<4;line++) {
+      float z = -.061 + float(line)*.032;
+      if (rect(paper,vec2(0.,z),vec2(.10,.0023)) < 0.) return stock*.69;
+    }
+    if (rect(paper,vec2(.041,.097),vec2(.058,.0035)) < 0.) return printColor;
+    return stock;
+  }
   if (id == 17.) return vec3(1.,.90,.62);
   bool protagonist = id < 10.;
   vec4 pose = protagonist ? PROTAGONIST : INTERROGATOR;
@@ -156,10 +179,11 @@ void main() {
   vec3 light = LAMP-p;
   float lit = smoothstep(-.01,.01,dot(n,normalize(light))-.1);
   float fall = 1.-smoothstep(.6,3.15,length(light));
-  float pool = 1.-smoothstep(.52,2.35,length(p.xz));
+  float pool = 1.-smoothstep(.52,2.35,length(p.xz-vec2(0.,.27)));
+  float exposure = mix(.70,1.07,smoothstep(-1.20,.80,p.z));
   vec3 ambient = vec3(.34,.39,.47);
   vec3 warm = vec3(1.07,1.03,.94);
-  vec3 color = base*mix(ambient,warm,lit*fall*pool);
+  vec3 color = base*mix(ambient,warm,lit*fall*pool)*exposure;
   color *= mix(.70,1.,shadow(p+n*.02,LAMP));
   if (base == ink || edge > .5) color = ink * mix(.60,1.,fall*pool);
   if (hit.y == 17.) color = base;

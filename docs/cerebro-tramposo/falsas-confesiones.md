@@ -10,7 +10,7 @@ La referencia principal es **EfectoFoco**. Sus personajes y muebles están const
 
 | Momento | Acción, cámara y transición |
 | --- | --- |
-| 1. La acusación | Una luz cálida delimita la mesa en una sala oscura. Un plano de conjunto fija el eje. En el plano del interrogador, el torso se adelanta y las manos avanzan por la mesa. En el contraplano, el protagonista retira las manos, se echa ligeramente atrás y niega con la cabeza. El acercamiento final sigue su mirada hacia abajo. Es la apertura dramatizada. |
+| 1. La acusación | Una luz cálida delimita la mesa en una sala oscura. Un plano de conjunto fija el eje. El investigador se inclina con las manos apoyadas junto al formulario. En el contraplano, el estudiante, más expuesto a la luz, recoge las manos y niega con la cabeza. La última pregunta se formula en el plano sobre el hombro del investigador, mientras la mirada del estudiante cae hacia la mesa. Es la apertura dramatizada. |
 | 2. El experimento | Corte de la luz de la mesa al brillo de un monitor CRT. El mismo protagonista escribe, el monitor se apaga y las manos se detienen. «1996» entra con los rótulos de EfectoFoco. |
 | 3. El falso testigo | El estudiante sigue sentado. Una figura a un lado del monitor asegura haberlo visto tocar Alt. Él lo niega y baja los hombros. Un acercamiento gradual deja al testigo fuera del encuadre. |
 | 4. La duda | Corte entre su rostro y sus manos quietas. Baja la cabeza hacia los dedos y luego mira el teclado. El foco del monitor cae sobre la tecla mientras el resto conserva el tratamiento de sombras. |
@@ -22,7 +22,7 @@ Fuentes del experimento y las cifras. [Kassin y Kiechel (1996)](https://journals
 
 ## Revisión de la primera escena
 
-Abre **Shorts → LaAcusacion** en Remotion Studio. La composición dura 8,2 segundos, en 540 × 960 a 30 fps.
+Abre **Shorts → LaAcusacion** en Remotion Studio. La composición dura aproximadamente 12,1 segundos, en 540 × 960 a 30 fps.
 
 ```sh
 npm start

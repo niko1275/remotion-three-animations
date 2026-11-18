@@ -68,7 +68,7 @@ function makeDisplay(letters: string) {
 
 type LabShot = Pick<ReturnType<typeof experimentFrame>, 'camera' | 'target' | 'time' | 'withdrawal'> & {pose: readonly [number, number, number, number]};
 
-export function LabStage({shot, motion, rule, shader = fragmentShader, displayTexture, extraUniforms, leftHover, children}: {
+export function LabStage({shot, motion, rule, shader = fragmentShader, displayTexture, extraUniforms, leftHover, rightHover, children}: {
   shot: LabShot;
   motion: ReturnType<typeof typingFrame>;
   rule: boolean;
@@ -76,6 +76,7 @@ export function LabStage({shot, motion, rule, shader = fragmentShader, displayTe
   displayTexture?: CanvasTexture;
   extraUniforms?: Record<string, {value: unknown}>;
   leftHover?: HandHover;
+  rightHover?: HandHover;
   children?: ReactNode;
 }) {
   const {width, height} = useVideoConfig();
@@ -85,7 +86,7 @@ export function LabStage({shot, motion, rule, shader = fragmentShader, displayTe
   useEffect(() => () => display?.dispose(), [display]);
   const {stroke, travel} = motion;
   const left = armPose(true, motion, shot.time, shot.withdrawal, shot.pose[0], leftHover);
-  const right = armPose(false, motion, shot.time, shot.withdrawal, shot.pose[0]);
+  const right = armPose(false, motion, shot.time, shot.withdrawal, shot.pose[0], rightHover);
 
   const uniforms = {
     R: {value: new Vector2(width, height)},

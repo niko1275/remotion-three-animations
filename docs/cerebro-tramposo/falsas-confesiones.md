@@ -94,3 +94,18 @@ Abre **Shorts → ElFalsoRecuerdo** en Studio. La composición dura 16 segundos 
 | Regreso | 12–16 s | Vuelve el campo sobre el estudiante y el CRT sigue en estado de error. Las manos se recogen. |
 
 Los textos están en `src/scenes/el-falso-recuerdo/script.ts`. `timeline.ts` separa los tiempos de las voces, la duración de los planos y la trayectoria de cada fragmento. El acercamiento de la mano se calcula aparte de la señal del teclado. El MP4 se exporta con `npm run render:el-falso-recuerdo`.
+
+## Escena 6 · Los resultados
+
+Abre **Shorts → LosResultados**. La escena dura 18 segundos a 1080 × 1920 y 30 fps, sin audio.
+
+| Plano | Tiempo | Acción |
+| --- | --- | --- |
+| La confesión | 0–5 s | El estudiante firma una declaración ficticia. Aparece el 69 %. |
+| La culpa | 5–10 s | El estudiante baja la mirada hacia sus manos. Aparece el 28 %. |
+| Los detalles inventados | 10–14 s | Alternan tres fragmentos mentales de la escena anterior. Aparece el 9 %. |
+| La verdad | 14–18 s | Acercamiento a ALT en reposo y fundido a negro. |
+
+Las cifras usan el mismo denominador, los 75 participantes analizados. Son tres medidas del estudio. [Kassin y Kiechel (1996), resultados y discusión](https://saulkassin.org/wp-content/uploads/2024/07/kassin_kiechel_1996.pdf)
+
+La narración está en `src/scenes/los-resultados/script.ts`; las duraciones y posiciones de las líneas, en `timeline.ts`. La trayectoria de la punta y el trazo escrito comparten los puntos de `signature.ts`. Exporta con `npm run render:los-resultados`.

@@ -53,10 +53,20 @@ Los valores predeterminados de las pruebas están en `src/voice/preview.tsx`. Pu
 
 Para comprobar un ambiente continuo, coloca una pista local en `public/voices/ambiente.mp3` y asigna `ambience: 'voices/ambiente.mp3'` en las propiedades de la prueba. La pista se monta una sola vez durante los 12 segundos y sigue sonando sobre ambas uniones. Los rótulos dejan libres los fotogramas de unión. Ajusta los recortes de silencio tras oír las tomas definitivas. La prueba conserva las respiraciones que estén dentro del intervalo elegido.
 
-## Configurar ElevenLabs para cuando se autorice
+## Preparar la primera prueba de ElevenLabs
 
-1. Copia `configs/voices.example.json` a `configs/voices.local.json` y asigna un `voice_id` a narrador, investigador, estudiante y testigo. El modelo predeterminado es `eleven_multilingual_v2`, compatible con español. Puedes cambiar `modelId` para utilizar otro modelo compatible.
-2. Define `ELEVENLABS_API_KEY` como variable del entorno local desde el que ejecutarás el script. La clave solo la lee Node. El archivo de configuración local y `.env` están excluidos de Git. El script toma el valor del entorno y no carga `.env` automáticamente.
-3. Después de autorizar el gasto, solicita una intervención concreta con `npm run voices -- generate s1-01 --confirm-paid`. Añade `--replace` si existe un borrador que deseas sustituir. Una toma aprobada se bloquea antes de cualquier llamada.
+Las cuatro voces del proyecto están en [configs/voices.ts](../../configs/voices.ts). Si tienes un `configs/voices.local.json` de la versión anterior, cualquier ID rellenado sigue teniendo prioridad. Puedes retirar ese archivo local para usar las cuatro voces del proyecto.
+
+Ejecuta `npm run voices -- plan` para revisar las tres intervenciones de la escena 1, sus voces, planos y gestos. Este comando funciona sin clave y sin llamar a ElevenLabs.
+
+Cuando autorices la generación, define `ELEVENLABS_API_KEY` en el entorno local de Node y ejecuta un comando por intervención desde CMD.
+
+```cmd
+npm run voices -- generate s1-01 --confirm-paid
+npm run voices -- generate s1-02 --confirm-paid
+npm run voices -- generate s1-03 --confirm-paid
+```
+
+Cada comando genera un MP3 local y guarda los timestamps disponibles en el manifiesto. La clave solo la lee el proceso de Node. El script no carga `.env` automáticamente y no incluye la clave en el navegador. Para revisar las tomas, abre **Shorts → LaAcusacionVoces**. Si quieres probar la unión con ambas voces, importa una toma local para `s7-03` o autoriza su generación por separado.
 
 La generación usa el endpoint oficial con timestamps. Guarda el MP3 por intervención y la alineación de palabras disponible. Las respuestas exitosas se respaldan con su alineación original en `.voice-work/` para que una validación fallida no obligue a pagar otra vez. Ante un error de red, revisa el historial antes de reintentar. [API de ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps)

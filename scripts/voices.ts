@@ -1,6 +1,7 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {mkdir,open,readFile,rename,rm,writeFile} from 'node:fs/promises';
 import {parseArgs} from 'node:util';
+import {voiceConfig} from '../configs/voices';
 import {accusationCameraCuts,accusationScript,roles,voiceFps,voiceScript} from '../src/voice/script';
 import {accusationFrames} from '../src/scenes/la-acusacion/timeline';
 import {buildVoiceTimeline,usableAudio} from '../src/voice/timing';
@@ -90,6 +91,25 @@ function scriptForReview() {
     audioFile:null,durationSeconds:null,timestamps:[]}));
 }
 
+async function loadVoiceConfig() {
+  try {
+    const config = await json<typeof voiceConfig>('configs/voices.local.json');
+    if (!config.modelId?.trim() || !roles.every(role => typeof config.voiceIds?.[role] === 'string')) {
+      throw new Error('Configuración local de voces inválida.');
+    }
+    // Older local templates had empty IDs. Use the project IDs for those roles.
+    return {
+      modelId: config.modelId.trim(),
+      voiceIds: Object.fromEntries(roles.map(role => [
+        role, config.voiceIds[role].trim() || voiceConfig.voiceIds[role],
+      ])),
+    };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return voiceConfig;
+    throw error;
+  }
+}
+
 async function main() {
   const {values,positionals} = parseArgs({
     allowPositionals:true,
@@ -98,6 +118,15 @@ async function main() {
   const [job,id,input] = positionals;
   if (job==='script') {
     console.log(JSON.stringify(scriptForReview(),null,2));
+    return;
+  }
+  if (job === 'plan') {
+    const config = await loadVoiceConfig();
+    console.log(JSON.stringify(accusationScript.map(cue => ({
+      ...cue,
+      voiceId: config.voiceIds[cue.role],
+      modelId: config.modelId,
+    })), null, 2));
     return;
   }
   if (job==='report') {
@@ -115,7 +144,7 @@ async function main() {
     return;
   }
   if (!['import','generate','approve'].includes(job??'')) {
-    throw new Error('Uso: npm run voices -- script | report | import ID ARCHIVO.mp3 [--words PALABRAS.json] | generate ID --confirm-paid | approve ID');
+    throw new Error('Uso: npm run voices -- script | report | plan | import ID ARCHIVO.mp3 [--words PALABRAS.json] | generate ID --confirm-paid | approve ID');
   }
   const cue=voiceScript.find(entry=>entry.id===id);
   if(!cue) throw new Error(`Intervención desconocida: ${id??''}`);
@@ -153,10 +182,8 @@ async function main() {
       if(values.words) throw new Error('--words se usa al importar MP3 locales.');
       const apiKey=process.env.ELEVENLABS_API_KEY;
       if(!apiKey) throw new Error('Falta ELEVENLABS_API_KEY en el entorno de Node.');
-      const config=await json<{modelId:string;voiceIds:Record<string,string>}>('configs/voices.local.json');
-      if(!config.modelId?.trim()||!roles.every(role=>typeof config.voiceIds?.[role]==='string')) throw new Error('Configuración de voces inválida.');
-      const voiceId=config.voiceIds[cue.role].trim();
-      if(!voiceId) throw new Error(`Falta el voice_id para ${cue.role}.`);
+      const config = await loadVoiceConfig();
+      const voiceId = config.voiceIds[cue.role];
       let response: Response;
       try {
         response=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}/with-timestamps?output_format=mp3_44100_128`,{

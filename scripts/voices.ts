@@ -197,7 +197,23 @@ async function main() {
       }, {timeoutInSeconds: 60, maxRetries: 0}).catch((error: unknown) => {
         const checkHistory = 'Revisa el historial de ElevenLabs antes de reintentar.';
         if (error instanceof ElevenLabsError && error.statusCode) {
-          throw new Error(`ElevenLabs respondió HTTP ${error.statusCode}. Referencia: ${error.requestId ?? 'sin referencia'}.`);
+          const body = error.body as {detail?: {status?: unknown; code?: unknown}; status?: unknown; code?: unknown} | undefined;
+          const reasons: Record<string, string> = {
+            invalid_api_key: 'La API rechazó la clave usada por el generador.',
+            missing_api_key: 'La API no recibió una clave válida.',
+            missing_permissions: 'Revisa el permiso Text to Speech en la clave.',
+            insufficient_permissions: 'Revisa el permiso Text to Speech en la clave.',
+            unauthorized: 'La API denegó el acceso. Comprueba la clave y sus permisos de Text to Speech.',
+            quota_exceeded: 'La cuenta alcanzó su cuota.',
+            voice_not_found: 'La voz configurada no está disponible en esta cuenta.',
+            paid_plan_required: 'La voz o el modelo requiere un plan de pago.',
+            detected_unusual_activity: 'ElevenLabs bloqueó la solicitud por actividad inusual. Consulta el estado de la cuenta.',
+          };
+          const code = [body?.detail?.status, body?.detail?.code, body?.status, body?.code]
+            .find((value): value is string => typeof value === 'string' && Object.prototype.hasOwnProperty.call(reasons, value));
+          const reference = error.requestId ?? error.rawResponse?.headers?.get('request-id') ?? 'sin referencia';
+          const reason = code ? ` ${code}: ${reasons[code]}` : ' ElevenLabs no devolvió un código de error reconocido.';
+          throw new Error(`ElevenLabs respondió HTTP ${error.statusCode}.${reason} Referencia: ${reference}.`);
         }
         if (error instanceof ElevenLabsTimeoutError) {
           throw new Error(`La solicitud superó los 60 s de espera. ${checkHistory}`);

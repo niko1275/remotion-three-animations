@@ -88,9 +88,9 @@ Abre **Shorts → ElFalsoRecuerdo** en Studio. La composición dura 16 segundos 
 | Plano | Tiempo | Acción |
 | --- | --- | --- |
 | Duda | 0–3 s | Continuación del encuadre de la escena 4. El estudiante mira hacia abajo y se pregunta si pudo haber sido él. |
-| Fragmento 1 | 3–6 s | La mano se acerca a ALT y se detiene antes de alcanzarla. |
-| Fragmento 2 | 6–9 s | El gesto vuelve a empezar desde el lado contrario, con un alcance distinto. |
-| Fragmento 3 | 9–12 s | El plano se estrecha alrededor del índice y ALT. El dedo queda por encima de la tecla. |
+| Fragmento 1 | 3–6 s | La mano se acerca a ALT, vacila y se retira un poco. |
+| Fragmento 2 | 6–9 s | El gesto reaparece a medio camino, desde el lado contrario. Se interrumpe y vuelve a avanzar. |
+| Fragmento 3 | 9–12 s | El plano se estrecha alrededor del índice y ALT. El montaje corta mientras el dedo aún se acerca, por encima de la tecla. |
 | Regreso | 12–16 s | Vuelve el campo sobre el estudiante y el CRT sigue en estado de error. Las manos se recogen. |
 
 Los textos están en `src/scenes/el-falso-recuerdo/script.ts`. `timeline.ts` separa los tiempos de las voces, la duración de los planos y la trayectoria de cada fragmento. El acercamiento de la mano se calcula aparte de la señal del teclado. El MP4 se exporta con `npm run render:el-falso-recuerdo`.

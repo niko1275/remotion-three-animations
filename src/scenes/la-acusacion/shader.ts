@@ -1,7 +1,8 @@
 import {seatedBody, seatedDimensions, seatedTransforms} from '../seatedActor';
 import {forms, hair, lighting} from '../efecto-foco/shaderParts';
 
-export const accusationShader = `
+export function makeAccusationShader(parts: {arms?: string} = {}) {
+  return `
 precision highp float;
 uniform vec2 R, HANDS;
 uniform float T;
@@ -52,7 +53,7 @@ ${seatedBody}  for (int i=0;i<2;i++) {
     } else {
       hand.z += .003*sin(T*2.+side);
     }
-    NEAR(min(cap(p,shoulder,elbow,.06),cap(p,elbow,hand,.055)),4.+offset)
+${parts.arms ?? ''}    NEAR(min(cap(p,shoulder,elbow,.06),cap(p,elbow,hand,.055)),4.+offset)
     NEAR(length(p-hand)-.062,9.+offset)
   }
   return vec2(d,id);
@@ -166,3 +167,6 @@ void main() {
   gl_FragColor = vec4(color,1.);
 }
 `;
+}
+
+export const accusationShader = makeAccusationShader();

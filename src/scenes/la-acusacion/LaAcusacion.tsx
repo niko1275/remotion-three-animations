@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {ThreeCanvas} from '@remotion/three';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import {GLSL3, Vector2, Vector3, Vector4} from 'three';
@@ -7,13 +8,21 @@ import {accusationFrame} from './timeline';
 
 const vertexShader = `in vec3 position;
 void main() { gl_Position = vec4(position.xy, 0., 1.); }`;
-const fragmentShader = accusationShader.replace('precision highp float;',
-  'precision highp float;\nout vec4 outputColor;\n#define gl_FragColor outputColor\n');
+export function toAccusationFragmentShader(shader: string) {
+  return shader.replace('precision highp float;',
+    'precision highp float;\nout vec4 outputColor;\n#define gl_FragColor outputColor\n');
+}
+const fragmentShader = toAccusationFragmentShader(accusationShader);
 
-export function LaAcusacion() {
-  const frame = useCurrentFrame();
+type RoomShot = Omit<ReturnType<typeof accusationFrame>, 'caption'>;
+
+export function AccusationStage({shot, shader = fragmentShader, children}: {
+  shot: RoomShot;
+  shader?: string;
+  children?: ReactNode;
+}) {
   const {width, height} = useVideoConfig();
-  const {time, camera, target, caption, interrogator, protagonist, hands} = accusationFrame(frame);
+  const {time, camera, target, interrogator, protagonist, hands} = shot;
   const uniforms = {
     R: {value: new Vector2(width, height)},
     T: {value: time},
@@ -29,12 +38,19 @@ export function LaAcusacion() {
       <mesh frustumCulled={false}>
         <planeGeometry args={[2, 2]} />
         <rawShaderMaterial
-          vertexShader={vertexShader} fragmentShader={fragmentShader} uniforms={uniforms}
+          vertexShader={vertexShader} fragmentShader={shader} uniforms={uniforms}
           glslVersion={GLSL3} depthTest={false} depthWrite={false}
         />
       </mesh>
     </ThreeCanvas>
     <FocoGrain />
-    <FocoCaption top="79%">{caption}</FocoCaption>
+    {children}
   </AbsoluteFill>;
+}
+
+export function LaAcusacion() {
+  const shot = accusationFrame(useCurrentFrame());
+  return <AccusationStage shot={shot}>
+    <FocoCaption top="79%">{shot.caption}</FocoCaption>
+  </AccusationStage>;
 }

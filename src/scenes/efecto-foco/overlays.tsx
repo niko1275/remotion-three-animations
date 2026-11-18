@@ -31,11 +31,11 @@ export function FocoGrain() {
   }} />;
 }
 
-export function FocoCaption({children, top = '66%', size = .06, inset = '6%'}: {children: string; top?: string; size?: number; inset?: string}) {
+export function FocoCaption({children, top = '66%', size = .06, inset = '6%', centerY = false}: {children: string; top?: string; size?: number; inset?: string; centerY?: boolean}) {
   const {width} = useVideoConfig();
   const scale = width / 420;
   return <div style={{
-    position: 'absolute', left: inset, right: inset, top, textAlign: 'center',
+    position: 'absolute', left: inset, right: inset, top, transform: centerY ? 'translateY(-50%)' : undefined, textAlign: 'center',
     fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif',
     fontWeight: 800, fontSize: width * size, lineHeight: 1.2, color: '#fff',
     textShadow: [

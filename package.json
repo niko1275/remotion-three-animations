@@ -14,6 +14,7 @@
     "render:el-falso-testigo": "remotion render src/index.ts ElFalsoTestigo out/el-falso-testigo.mp4 --gl=swangle",
     "render:el-falso-recuerdo": "remotion render src/index.ts ElFalsoRecuerdo out/el-falso-recuerdo.mp4 --gl=swangle",
     "render:los-resultados": "remotion render src/index.ts LosResultados out/los-resultados.mp4 --gl=swangle",
+    "render:el-cierre": "remotion render src/index.ts ElCierre out/el-cierre.mp4 --gl=swangle",
     "render:hospital": "remotion render src/index.ts Hospital out/hospital.mp4 --gl=angle",
     "render:workshop": "remotion render src/index.ts Workshop out/workshop.mp4 --gl=angle",
     "still:hospital": "remotion still src/index.ts Hospital out/hospital.png --frame=90 --gl=angle",

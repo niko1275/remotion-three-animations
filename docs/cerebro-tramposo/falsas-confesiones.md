@@ -109,3 +109,15 @@ Abre **Shorts → LosResultados**. La escena dura 18 segundos a 1080 × 1920 y 3
 Las cifras usan el mismo denominador, los 75 participantes analizados. Son tres medidas del estudio. [Kassin y Kiechel (1996), resultados y discusión](https://saulkassin.org/wp-content/uploads/2024/07/kassin_kiechel_1996.pdf)
 
 La narración está en `src/scenes/los-resultados/script.ts`; las duraciones y posiciones de las líneas, en `timeline.ts`. La trayectoria de la punta y el trazo escrito comparten los puntos de `signature.ts`. Exporta con `npm run render:los-resultados`.
+
+## Escena 7 · El cierre
+
+Abre **Shorts → ElCierre**. La composición dura 18 segundos a 1080 × 1920 y 30 fps, sin audio. La sala de la primera escena vuelve como representación dramática.
+
+| Plano | Tiempo | Acción |
+| --- | --- | --- |
+| Regreso | 0–6 s | Plano general de la sala. El estudiante mantiene las manos juntas y la cabeza baja. |
+| Primera persona | 6–13 s | Corte a la altura de sus ojos. El investigador sostiene la mirada y se adelanta apenas. |
+| Pregunta | 13–18 s | Continúa el mismo eje de cámara, la sala se apaga y la pregunta queda centrada sobre negro. |
+
+La narración y la pregunta están en `src/scenes/el-cierre/script.ts`. `timeline.ts` separa los tiempos de voz, el fundido y la entrada de la pregunta. En la versión provisional, la pregunta queda a opacidad completa durante 72 fotogramas y permanece visible después del final previsto de la voz. Exporta con `npm run render:el-cierre`.

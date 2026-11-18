@@ -1,3 +1,5 @@
+import {CerebroTramposoNarrado, narrationMetadata} from './voice/NarratedShort';
+import {narrationSourceFrames} from './voice/narration';
 import {LaAcusacionVoces, PruebaLoopVoces, loopVoiceFrames, voiceMetadata, voicePreviewDefaults} from './voice/preview';
 import {PruebaLoop, loopPreviewFrames} from './scenes/el-cierre/PruebaLoop';
 import {ElCierre} from './scenes/el-cierre/ElCierre';
@@ -35,6 +37,7 @@ export const Root = () => <>
     <Composition id="ElFalsoRecuerdo" component={ElFalsoRecuerdo} durationInFrames={memoryFrames} fps={memoryFps} width={1080} height={1920}/>
     <Composition id="LosResultados" component={LosResultados} durationInFrames={resultsFrames} fps={resultsFps} width={1080} height={1920}/>
     <Composition id="ElCierre" component={ElCierre} durationInFrames={closingFrames} fps={closingFps} width={1080} height={1920}/>
+    <Composition id="CerebroTramposoNarrado" component={CerebroTramposoNarrado} durationInFrames={narrationSourceFrames} fps={accusationFps} width={1080} height={1920} defaultProps={voicePreviewDefaults} calculateMetadata={narrationMetadata}/>
     <Composition id="LaAcusacionVoces" component={LaAcusacionVoces} durationInFrames={accusationFrames} fps={accusationFps} width={1080} height={1920} defaultProps={voicePreviewDefaults} calculateMetadata={voiceMetadata(false)}/>
     <Composition id="PruebaLoopVoces" component={PruebaLoopVoces} durationInFrames={loopVoiceFrames} fps={accusationFps} width={1080} height={1920} defaultProps={voicePreviewDefaults} calculateMetadata={voiceMetadata(true)}/>
     <Composition id="PruebaLoop" component={PruebaLoop} durationInFrames={loopPreviewFrames} fps={closingFps} width={1080} height={1920}/>

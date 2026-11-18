@@ -122,8 +122,9 @@ export function LabStage({shot, motion, rule, shader = fragmentShader, displayTe
   </AbsoluteFill>;
 }
 
-export function ElExperimento() {
-  const frame = useCurrentFrame();
+export function ElExperimento({sourceFrame}: {sourceFrame?: number} = {}) {
+  const current = useCurrentFrame();
+  const frame = sourceFrame ?? current;
   const shot = experimentFrame(frame);
   return <LabStage shot={shot} motion={typingFrame(frame)} rule={shot.shot === 'regla'}>
     {shot.shot === 'laboratorio' && shot.local >= 25 && shot.local < 108 && <FocoCaption top="16%">1996</FocoCaption>}

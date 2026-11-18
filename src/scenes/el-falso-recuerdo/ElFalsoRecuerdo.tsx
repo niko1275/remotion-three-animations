@@ -8,8 +8,9 @@ import {memoryFrame, rememberedLetters} from './timeline';
 
 const shader = toLabFragmentShader(trapShader);
 
-export function ElFalsoRecuerdo() {
-  const state = memoryFrame(useCurrentFrame());
+export function ElFalsoRecuerdo({sourceFrame, narrated = false}: {sourceFrame?: number; narrated?: boolean} = {}) {
+  const frame = useCurrentFrame();
+  const state = memoryFrame(sourceFrame ?? frame);
   const remembered = useMemo(() => makeTrapDisplay('text',rememberedLetters), []);
   const present = useMemo(() => makeTrapDisplay('error',''), []);
   useEffect(() => () => remembered.dispose(), [remembered]);
@@ -28,6 +29,6 @@ export function ElFalsoRecuerdo() {
       background: 'radial-gradient(ellipse at 49% 42%, transparent 29%, #171613 100%)',
       opacity: state.isolate, pointerEvents: 'none',
     }} />
-    {state.caption && <FocoCaption top="79%">{state.caption}</FocoCaption>}
+    {!narrated && state.caption && <FocoCaption top="79%">{state.caption}</FocoCaption>}
   </LabStage>;
 }

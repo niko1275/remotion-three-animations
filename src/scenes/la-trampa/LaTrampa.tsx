@@ -41,22 +41,23 @@ export function makeTrapDisplay(mode: string, text: string) {
   });
 }
 
-export function LaTrampa() {
-  const state = trapFrame(useCurrentFrame());
+export function LaTrampa({sourceFrame, narrated = false}: {sourceFrame?: number; narrated?: boolean} = {}) {
+  const frame = useCurrentFrame();
+  const state = trapFrame(sourceFrame ?? frame);
   const display = useMemo(() => makeTrapDisplay(state.displayMode,state.letters), [state.displayMode,state.letters]);
   useEffect(() => () => display.dispose(),[display]);
 
-  return <LabStage shot={state} motion={state.motion} rule={state.rule}
+  return <LabStage shot={narrated ? {...state, pose: [state.pose[0], state.pose[1], state.pose[2], 0]} : state} motion={state.motion} rule={state.rule}
     shader={fragmentShader} displayTexture={display}
     extraUniforms={{
       POINT: {value: state.point},
       RESEARCHER_PRESENT: {value: state.researcherPresent ? 1 : 0},
-      RESEARCHER_MOUTH: {value: state.researcherMouth},
+      RESEARCHER_MOUTH: {value: narrated ? 0 : state.researcherMouth},
       SURPRISE: {value: state.surprise},
       SCREEN_LEVEL: {value: state.dimScreen},
     }}>
     <AbsoluteFill style={{background: '#171613', opacity: 1-state.exposure, pointerEvents: 'none'}} />
-    {state.caption && <FocoCaption top="79%">{state.caption}</FocoCaption>}
+    {!narrated && state.caption && <FocoCaption top="79%">{state.caption}</FocoCaption>}
     <AbsoluteFill style={{background: '#000', opacity: state.black, pointerEvents: 'none'}} />
   </LabStage>;
 }

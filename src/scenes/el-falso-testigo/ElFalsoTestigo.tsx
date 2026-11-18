@@ -16,8 +16,9 @@ const shader = toLabFragmentShader(makeTrapShader({
   researcherYaw: 'RESEARCHER_YAW',
 }));
 
-export function ElFalsoTestigo() {
-  const state = witnessFrame(useCurrentFrame());
+export function ElFalsoTestigo({sourceFrame, narrated = false}: {sourceFrame?: number; narrated?: boolean} = {}) {
+  const frame = useCurrentFrame();
+  const state = witnessFrame(sourceFrame ?? frame);
   const display = useMemo(() => makeTrapDisplay('error',''), []);
   useEffect(() => () => display.dispose(), [display]);
 
@@ -26,15 +27,15 @@ export function ElFalsoTestigo() {
       POINT: {value: 0},
       RESEARCHER_PRESENT: {value: 1},
       RESEARCHER_YAW: {value: state.researcherYaw},
-      RESEARCHER_MOUTH: {value: state.researcherMouth},
+      RESEARCHER_MOUTH: {value: narrated ? 0 : state.researcherMouth},
       SURPRISE: {value: state.surprise},
       SCREEN_LEVEL: {value: 1},
       WITNESS_HEAD: {value: new Vector2(...state.witnessHead)},
-      WITNESS_MOUTH: {value: state.witnessMouth},
+      WITNESS_MOUTH: {value: narrated ? 0 : state.witnessMouth},
     }}>
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at 49% 38%, transparent 24%, #171613 100%)',
       opacity: state.isolate, pointerEvents: 'none'}} />
-    {state.caption && <FocoCaption top="77%">{state.caption}</FocoCaption>}
+    {!narrated && state.caption && <FocoCaption top="77%">{state.caption}</FocoCaption>}
     <AbsoluteFill style={{background: '#000', opacity: state.black, pointerEvents: 'none'}} />
   </LabStage>;
 }

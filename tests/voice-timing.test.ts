@@ -1,3 +1,5 @@
+import {narrationBlocks, narrationSourceFrames} from '../src/voice/narration';
+import {narrationTimeline} from '../src/voice/narration-timing';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {accusationCameraCuts,accusationScript,voiceFps} from '../src/voice/script';
@@ -36,4 +38,24 @@ test('stale recording falls back to original frames and pauses can be edited',()
   assert.equal(plan.tracks[0].audio,undefined);
   const cues=accusationScript.map((item,i)=>i===1?{...item,pauseBeforeSeconds:.5}:item);
   assert.equal(buildVoiceTimeline(cues,{},accusationFrames,voiceFps).tracks[1].start,68+15);
+});
+
+
+test('narration uses one clip per scene and anchors visual events to phrase starts', () => {
+  const {cue, beats} = narrationBlocks[2];
+  const words = cue.text.split(/\s+/).map((text, i) => ({text, start: i / 3, end: (i + .8) / 3}));
+  const seconds = words.length / 3;
+  const clips = narrationTimeline({
+    [cue.id]: {...audio, text: cue.text, seconds, outSeconds: seconds, words},
+  }, {n3: .5, n7: 2});
+  assert.equal(narrationTimeline({}).reduce((sum, clip) => sum + clip.durationInFrames, 0), narrationSourceFrames);
+  assert.equal(clips.length, 7);
+  assert.ok(clips.every(clip => clip.cue.role === 'narrador' && clip.plan.tracks.length === 1));
+  assert.ok(clips[0].cue.text.startsWith('Fuiste tú. Presionaste la tecla.'));
+  assert.ok(clips[6].cue.text.endsWith('Y todo puede comenzar cuando alguien te dice...'));
+  assert.equal(clips[6].durationInFrames, clips[6].plan.frames);
+  assert.equal(clips[2].durationSeconds, seconds);
+  const crashFrame = beats[0].text.split(/\s+/).length * 10;
+  assert.equal(sampleVisualFrame(clips[2].plan, crashFrame), 59);
+  assert.equal(clips[3].startFrame, clips[2].startFrame + Math.ceil(seconds * voiceFps) + 15);
 });

@@ -24,8 +24,9 @@ function makeDeclaration() {
   });
 }
 
-export function LosResultados() {
-  const state = resultsFrame(useCurrentFrame());
+export function LosResultados({sourceFrame}: {sourceFrame?: number} = {}) {
+  const frame = useCurrentFrame();
+  const state = resultsFrame(sourceFrame ?? frame);
   const document = useMemo(makeDeclaration, []);
   const present = useMemo(() => makeTrapDisplay('error',''), []);
   const remembered = useMemo(() => makeTrapDisplay('text',rememberedLetters), []);

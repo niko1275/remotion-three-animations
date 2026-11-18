@@ -1,3 +1,5 @@
+import {narrationBlocks} from '../src/voice/narration';
+import {narrationTimeline} from '../src/voice/narration-timing';
 import {ElevenLabsClient, ElevenLabsError, ElevenLabsTimeoutError} from '@elevenlabs/elevenlabs-js';
 import {config as loadEnv} from 'dotenv';
 import {createHash,randomUUID} from 'node:crypto';
@@ -118,6 +120,15 @@ async function main() {
     options:{replace:{type:'boolean'},'confirm-paid':{type:'boolean'},words:{type:'string'},in:{type:'string'},out:{type:'string'}},
   });
   const [job,id,input] = positionals;
+  if (job === 'narration') {
+    const clips = narrationTimeline(await readManifest());
+    console.log(JSON.stringify(clips.map(({cue, beats, plan, ...clip}) => ({
+      ...clip, id: cue.id, scene: cue.scene, text: cue.text, shots: cue.shots,
+      voiceId: voiceConfig.voiceIds.narrador, modelId: voiceConfig.modelId,
+      events: beats, visualTiming: plan.points, timestamps: plan.tracks[0].audio?.words ?? [],
+    })), null, 2));
+    return;
+  }
   if (job==='script') {
     console.log(JSON.stringify(scriptForReview(),null,2));
     return;
@@ -146,10 +157,12 @@ async function main() {
     return;
   }
   if (!['import','generate','approve'].includes(job??'')) {
-    throw new Error('Uso: npm run voices -- script | report | plan | import ID ARCHIVO.mp3 [--words PALABRAS.json] | generate ID --confirm-paid | approve ID');
+    throw new Error('Uso: npm run voices -- narration | script | report | plan | import ID ARCHIVO.mp3 [--words PALABRAS.json] | generate ID --confirm-paid | approve ID');
   }
-  const cue=voiceScript.find(entry=>entry.id===id);
+  const narrated = narrationBlocks.find(block => block.cue.id === id);
+  const cue = narrated?.cue ?? voiceScript.find(entry => entry.id === id);
   if(!cue) throw new Error(`Intervención desconocida: ${id??''}`);
+  if (job === 'generate' && !narrated) throw new Error('Genera la narración por escena con un ID de n1 a n7.');
   if(job==='generate'&&!values['confirm-paid']) throw new Error('La generación requiere confirmación explícita con --confirm-paid.');
   if(job==='import'&&!input) throw new Error('Indica la ruta de un MP3 local.');
 
@@ -186,8 +199,8 @@ async function main() {
       if (!process.env.ELEVENLABS_API_KEY?.trim()) {
         throw new Error('Falta ELEVENLABS_API_KEY en el entorno de Node o en .env.local.');
       }
-      const config = await loadVoiceConfig();
-      const voiceId = config.voiceIds[cue.role];
+      const config = voiceConfig;
+      const voiceId = config.voiceIds.narrador;
       const client = new ElevenLabsClient();
       const body = await client.textToSpeech.convertWithTimestamps(voiceId, {
         text: cue.text,

@@ -22,7 +22,7 @@ const timeline=(manifest:VoiceManifest, pauses: Record<string,number>)=>
   buildVoiceTimeline(accusationScript.map(cue=>({...cue,pauseBeforeSeconds:pauses[cue.id]??cue.pauseBeforeSeconds})),
     manifest,accusationFrames,voiceFps,accusationCameraCuts);
 
-async function localManifest(): Promise<VoiceManifest> {
+export async function localManifest(): Promise<VoiceManifest> {
   const response=await fetch(staticFile('voices/manifest.json'),{cache:'no-store'});
   if(response.status===404) return {};
   if(!response.ok) throw new Error(`No se pudo leer el manifiesto de voces (HTTP ${response.status}).`);
@@ -35,7 +35,7 @@ export const voiceMetadata = (loop: boolean): CalculateMetadataFunction<VoicePre
     return {durationInFrames:loop?loopVoiceFrames:timeline(manifest,props.pauses).frames,props:{...props,manifest}};
   };
 
-function Track({track}: {track: VoiceTrack}) {
+export function Track({track}: {track: VoiceTrack}) {
   if(!track.audio) return null;
   return <Sequence from={track.start} durationInFrames={track.frames} layout="none" name={track.cue.id}>
     <Html5Audio src={staticFile(track.audio.file)} trimBefore={track.trimBefore}
@@ -43,7 +43,7 @@ function Track({track}: {track: VoiceTrack}) {
   </Sequence>;
 }
 
-function Ambience({ambience,ambienceVolume}: VoicePreviewProps) {
+export function Ambience({ambience,ambienceVolume}: VoicePreviewProps) {
   return ambience ? <Html5Audio src={staticFile(ambience)} loop volume={ambienceVolume}/> : null;
 }
 

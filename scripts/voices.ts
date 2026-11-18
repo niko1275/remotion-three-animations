@@ -1,4 +1,4 @@
-import {ElevenLabsClient, ElevenLabsError} from '@elevenlabs/elevenlabs-js';
+import {ElevenLabsClient, ElevenLabsError, ElevenLabsTimeoutError} from '@elevenlabs/elevenlabs-js';
 import {config as loadEnv} from 'dotenv';
 import {createHash,randomUUID} from 'node:crypto';
 import {mkdir,open,readFile,rename,rm,writeFile} from 'node:fs/promises';
@@ -195,10 +195,25 @@ async function main() {
         outputFormat: 'mp3_44100_128',
         ...(config.modelId === 'eleven_multilingual_v2' ? {} : {languageCode: 'es'}),
       }, {timeoutInSeconds: 60, maxRetries: 0}).catch((error: unknown) => {
+        const checkHistory = 'Revisa el historial de ElevenLabs antes de reintentar.';
         if (error instanceof ElevenLabsError && error.statusCode) {
           throw new Error(`ElevenLabs respondió HTTP ${error.statusCode}. Referencia: ${error.requestId ?? 'sin referencia'}.`);
         }
-        throw new Error('Error de red o respuesta de ElevenLabs. Revisa el historial antes de reintentar.');
+        if (error instanceof ElevenLabsTimeoutError) {
+          throw new Error(`La solicitud superó los 60 s de espera. ${checkHistory}`);
+        }
+        if (error instanceof Error && ['ParseError', 'SyntaxError'].includes(error.name)) {
+          throw new Error(`El SDK no pudo leer la respuesta de generación. ${checkHistory}`);
+        }
+        let cause = error;
+        for (let depth = 0; cause instanceof Error && depth < 4; depth++) {
+          const {code, cause: next} = cause as NodeJS.ErrnoException & {cause?: unknown};
+          if (code && /^(EAI_AGAIN|ENOTFOUND|ECONNREFUSED|ECONNRESET|ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT|UND_ERR_SOCKET|UNABLE_TO_VERIFY_LEAF_SIGNATURE|SELF_SIGNED_CERT_IN_CHAIN|DEPTH_ZERO_SELF_SIGNED_CERT|CERT_HAS_EXPIRED)$/.test(code)) {
+            throw new Error(`Falló la conexión con ElevenLabs (${code}). ${checkHistory}`);
+          }
+          cause = next;
+        }
+        throw new Error(`ElevenLabs no devolvió una respuesta utilizable. ${checkHistory}`);
       });
       if (!body.audioBase64) throw new Error('ElevenLabs no devolvió audio MP3.');
       mp3 = Buffer.from(body.audioBase64, 'base64');

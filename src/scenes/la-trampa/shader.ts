@@ -1,6 +1,6 @@
 import {makeLabShader} from '../el-experimento/shader';
 
-type TrapShaderParts = Pick<NonNullable<Parameters<typeof makeLabShader>[0]>, 'declarations' | 'figures' | 'map' | 'palette'> & {researcherYaw?: string};
+type TrapShaderParts = Pick<NonNullable<Parameters<typeof makeLabShader>[0]>, 'declarations' | 'figures' | 'map' | 'palette' | 'hand'> & {researcherYaw?: string};
 
 export function makeTrapShader(parts: TrapShaderParts = {}) {
   return makeLabShader({
@@ -71,6 +71,7 @@ ${parts.map ?? ''}`,
     return vec3(.82,.63,.50);
   }
 ${parts.palette ?? ''}`,
+  hand: parts.hand,
   studentEyes: 'eye(h,0.) || (SURPRISE > .001 && dot(normalize(h), normalize(vec3(sign(h.x)*.4,-.06,-1.))) > .98-.007*SURPRISE)',
   studentMouth: '.035+.035*SURPRISE+.080*STUDENT.w',
   screen: '    color *= SCREEN_LEVEL;\n',

@@ -1,6 +1,7 @@
+import {Vector3} from 'three';
 import {smooth} from '../../components/characters/CharacterAnimations';
 import {alt} from '../el-experimento/keyboard';
-import {typingFrame} from '../el-experimento/timeline';
+import {studentZ, typingFrame} from '../el-experimento/timeline';
 import {memoryFrame, shots as memoryShots} from '../el-falso-recuerdo/timeline';
 import {resultsScript} from './script';
 import {signature, signaturePoint} from './signature';
@@ -34,6 +35,7 @@ const fragments = memoryShots.map((shot,i) => ({
   start: memoryShots.slice(0,i).reduce((sum,s)=>sum+s.frames,0),
 })).filter(shot => shot.fragment);
 const idle = typingFrame(0);
+const gripDistance = .088;
 
 export function resultsFrame(frame: number) {
   const shot = edit.find(shot=>frame<shot.end) ?? edit[edit.length-1];
@@ -43,19 +45,25 @@ export function resultsFrame(frame: number) {
   const motion = idle;
   const camera = shot.camera.map((p,i) => p+(shot.target[i]-p)*shot.push*phase(0,1)) as Point;
   const time = frame/resultsFps;
-  const common = {shot: shot.id, motion, time, leftHover: undefined, rightHover: undefined,
+  const common = {shot: shot.id, motion, time, leftHover: undefined, rightWrist: undefined as Vector3 | undefined,
     camera, target: shot.target, withdrawal: .96, imagining: false, paper: false,
-    signature: 0, pen: [0,0,0] as Point, black: 0, isolate: 0, graphicOpacity: phase(.14,.26),
+    signature: 0, pen: [0,0,0] as Point, penAxis: new Vector3(-.38,.54,.75).normalize(), black: 0, isolate: 0, graphicOpacity: phase(.14,.26),
     pose: [.035,0,.14,0] as const,
   };
   if (shot.id === 'confesion') {
     const signatureProgress = phase(.28,.82)*(signature.length-1);
     const [x,z] = signaturePoint(signatureProgress);
     const lift = .040*(1-phase(.1,.28)) + .040*phase(.82,.98);
+    const pen = new Vector3(x,.965+lift,z);
+    const penAxis = new Vector3(-.44+.065*Math.sin(signatureProgress*.22),.56,.70).normalize();
+    const across = new Vector3(penAxis.z,0,-penAxis.x).normalize();
+    const up = penAxis.clone().cross(across);
+    const rightWrist = pen.clone().addScaledVector(penAxis,gripDistance+.031)
+      .addScaledVector(across,.074).addScaledVector(up,-.011);
+    rightWrist.z -= studentZ;
     return {
       ...common, paper: true, signature: signatureProgress,
-      pen: [x,.965+lift,z] as Point,
-      rightHover: {x: x+.009, z: z+.017, lift: .027+lift, reach: .99},
+      pen: pen.toArray(), penAxis, rightWrist,
       pose: [.066, -.19, .37, 0] as const,
       graphicOpacity: phase(.38,.5),
     };

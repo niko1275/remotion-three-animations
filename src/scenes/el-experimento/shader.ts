@@ -19,6 +19,7 @@ type LabShaderParts = {
   figures?: string;
   map?: string;
   palette?: string;
+  hand?: {functions: string; sample: string};
   studentEyes?: string;
   studentMouth?: string;
   screen?: string;
@@ -72,7 +73,7 @@ float armSegment(vec3 p, vec3 start, vec3 end, float startRadius, float endRadiu
   return length(p-start-axis*t)-mix(startRadius,endRadius,t);
 }
 
-vec2 student(vec3 p) {
+${parts.hand?.functions ?? ''}vec2 student(vec3 p) {
   vec4 pose = STUDENT;
   float offset = 0.;
   vec2 seat = chair(p);
@@ -93,7 +94,7 @@ ${seatedBody}
     NEAR(armSegment(p,shoulder,elbow,${sleeve.shoulder},${sleeve.elbow}),4.)
     NEAR(armSegment(p,elbow,cuff,${sleeve.elbow},${sleeve.cuff}),4.)
     NEAR(cap(p,cuff,wrist,.027),9.)
-    vec3 handSpace = p-wrist;
+${parts.hand?.sample ?? ''}    vec3 handSpace = p-wrist;
     handSpace.xz = rot(-yaw)*handSpace.xz;
     handSpace += wrist;
     float bounds = rbox(handSpace,wrist+vec3(0.,-.005,-.065),vec3(.075,.055,.112),0.);

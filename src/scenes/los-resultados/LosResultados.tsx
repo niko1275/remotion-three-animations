@@ -37,7 +37,7 @@ export function LosResultados() {
     state.shot === 'culpa' ? results[1] : state.shot === 'fragmentos' ? results[2] : undefined;
   const lower = state.shot === 'culpa';
   return <LabStage shot={state} motion={state.motion} rule={false} shader={shader}
-    leftHover={state.leftHover} rightHover={state.rightHover}
+    leftHover={state.leftHover} rightWrist={state.rightWrist}
     displayTexture={state.imagining ? remembered : present}
     extraUniforms={{
       POINT: {value: 0}, RESEARCHER_PRESENT: {value: 0}, RESEARCHER_MOUTH: {value: 0},
@@ -45,6 +45,7 @@ export function LosResultados() {
       SHOW_PAPER: {value: state.paper ? 1 : 0},
       INK_PROGRESS: {value: state.signature},
       PEN: {value: new Vector3(...state.pen)},
+      PEN_AXIS: {value: state.penAxis},
       DECLARATION: {value: document},
     }}>
     <AbsoluteFill style={{

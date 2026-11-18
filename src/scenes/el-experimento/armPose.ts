@@ -7,7 +7,7 @@ export const forearmLength = .424;
 
 export type HandHover = {x: number; z: number; reach: number; lift: number};
 
-export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, time: number, withdrawal: number, lean: number, hover?: HandHover) {
+export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, time: number, withdrawal: number, lean: number, hover?: HandHover, wristTarget?: Vector3) {
   const side = left ? -1 : 1;
   const wrist = new Vector3(
     side * (.134 + .026 * withdrawal),
@@ -32,6 +32,8 @@ export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, t
   const sin = Math.sin(yaw);
   wrist.x += indexX - (cos * indexX + sin * indexZ);
   wrist.z += indexZ - (-sin * indexX + cos * indexZ);
+
+  if (wristTarget) wrist.copy(wristTarget);
 
   // The shoulder socket sits high on the side of the shirt, above the elbow.
   const shoulder = new Vector3(side * .152,

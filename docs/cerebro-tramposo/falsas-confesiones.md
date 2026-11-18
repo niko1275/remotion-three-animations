@@ -16,7 +16,7 @@ La referencia principal es **EfectoFoco**. Sus personajes y muebles están const
 | 4. El falso testigo y la duda | Después del testimonio, corte entre su rostro y sus manos quietas. Baja la cabeza hacia los dedos y luego mira el teclado. El foco del monitor cae sobre la tecla mientras el resto conserva el tratamiento de sombras. |
 | 5. El falso recuerdo | Tres cortes breves repiten una mano acercándose a Alt desde arriba, en perfil y desde la mirada del estudiante. Cada fragmento vuelve al comienzo del gesto. El rótulo «¿Y si sí la toqué?» y el regreso a sus manos quietas presentan la secuencia como una posibilidad. |
 | 6. La revelación | El escritorio queda en penumbra y las cifras entran sucesivamente con el tamaño, peso y contorno del rótulo original. «69 % firmó una confesión falsa». «28 % mostró internalización de la culpa». La atribución visible identifica a Kassin y Kiechel (1996) y remite al grupo total del estudio. |
-| 7. El cierre | Regreso al rostro con un avance lento. La habitación se desvanece mientras el personaje sostiene la mirada. Entra la pregunta «¿Y si pudieran convencerte de recordar algo que nunca ocurrió?». |
+| 7. El cierre | La mirada en primera persona vuelve al plano general de la apertura. Una frase abierta enlaza con la acusación cuando se repite el Short. |
 
 Fuentes del experimento y las cifras. [Kassin y Kiechel (1996)](https://journals.sagepub.com/doi/10.1111/j.1467-9280.1996.tb00344.x) · [Kassin y Gudjonsson (2004), tabla 5](https://journals.sagepub.com/doi/full/10.1111/j.1529-1006.2004.00016.x)
 
@@ -33,8 +33,8 @@ El render guarda un MP4 sin audio en `out/la-acusacion.mp4`.
 
 | Plano | Intervalo | Diálogo |
 | --- | --- | --- |
-| General | 0–42 | Silencio |
-| Investigador | 42–135 | 53–121 |
+| General | 0–42 | «Fuiste tú. Presionaste la tecla.» comienza en 0 |
+| Investigador | 42–135 | La primera intervención continúa hasta 68 |
 | Estudiante | 135–231 | 149–221 |
 | Sobre el hombro del investigador | 231–354 | 244–327 |
 
@@ -118,6 +118,8 @@ Abre **Shorts → ElCierre**. La composición dura 18 segundos a 1080 × 1920 y 
 | --- | --- | --- |
 | Regreso | 0–6 s | Plano general de la sala. El estudiante mantiene las manos juntas y la cabeza baja. |
 | Primera persona | 6–13 s | Corte a la altura de sus ojos. El investigador sostiene la mirada y se adelanta apenas. |
-| Pregunta | 13–18 s | Continúa el mismo eje de cámara, la sala se apaga y la pregunta queda centrada sobre negro. |
+| Enlace | 13–18 s | Regresa el plano general. Cámara y personajes se acomodan hasta coincidir con el fotograma inicial de la escena 1. |
 
-La narración y la pregunta están en `src/scenes/el-cierre/script.ts`. `timeline.ts` separa los tiempos de voz, el fundido y la entrada de la pregunta. En la versión provisional, la pregunta queda a opacidad completa durante 72 fotogramas y permanece visible después del final previsto de la voz. Exporta con `npm run render:el-cierre`.
+La última frase de `src/scenes/el-cierre/script.ts` continúa hasta el límite de la composición. La intervención del investigador comienza en el fotograma 0 de la escena 1 y cruza su primer corte. Los rótulos se despejan en la unión para que el último y el primer fotograma compartan la misma imagen. Los tiempos de voz siguen editables en las líneas de tiempo de ambas escenas.
+
+**Shorts → PruebaLoop** alterna los últimos 3 segundos de `ElCierre` y los primeros 3 de `LaAcusacion`, dos veces. Las uniones están en 0:03 y 0:09. La composición usa un solo lienzo de 1080 × 1920, como lo hará el montaje final. Exporta el cierre por separado con `npm run render:el-cierre`.

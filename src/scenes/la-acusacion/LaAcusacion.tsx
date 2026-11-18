@@ -16,9 +16,10 @@ const fragmentShader = toAccusationFragmentShader(accusationShader);
 
 type RoomShot = Omit<ReturnType<typeof accusationFrame>, 'caption'>;
 
-export function AccusationStage({shot, shader = fragmentShader, children}: {
+export function AccusationStage({shot, shader = fragmentShader, extraUniforms, children}: {
   shot: RoomShot;
   shader?: string;
+  extraUniforms?: Record<string, {value: unknown}>;
   children?: ReactNode;
 }) {
   const {width, height} = useVideoConfig();
@@ -31,6 +32,7 @@ export function AccusationStage({shot, shader = fragmentShader, children}: {
     INTERROGATOR: {value: new Vector4(...interrogator)},
     PROTAGONIST: {value: new Vector4(...protagonist)},
     HANDS: {value: new Vector2(...hands)},
+    ...extraUniforms,
   };
 
   return <AbsoluteFill style={{background: '#1c1714', overflow: 'hidden'}}>

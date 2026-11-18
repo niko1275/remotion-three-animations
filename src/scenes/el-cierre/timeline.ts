@@ -1,5 +1,5 @@
 import {smooth} from '../../components/characters/CharacterAnimations';
-import {shots as accusationShots} from '../la-acusacion/timeline';
+import {accusationFrame, shots as accusationShots} from '../la-acusacion/timeline';
 import {closingScript} from './script';
 
 type Point = [number, number, number];
@@ -7,7 +7,7 @@ export const closingFps = 30;
 export const shots = [
   {id: 'regreso', frames: 180},
   {id: 'primera-persona', frames: 210},
-  {id: 'pregunta', frames: 150},
+  {id: 'enlace', frames: 150},
 ];
 
 let cursor = 0;
@@ -21,16 +21,10 @@ export const closingFrames = cursor;
 export const narration = [
   {start: edit[0].start+15, frames: 148, text: closingScript[0]},
   {start: edit[1].start+30, frames: 153, text: closingScript[1]},
-  {start: edit[2].start+9, frames: 88, text: closingScript[2]},
+  {start: edit[2].start+7, frames: edit[2].frames-7, text: closingScript[2]},
 ];
 
-export const finalTiming = {
-  dimStart: edit[2].start+7,
-  fadeStart: edit[2].start+23,
-  blackout: edit[2].start+64,
-  questionStart: edit[2].start+65,
-  questionFull: edit[2].start+78,
-};
+const opening = accusationFrame(0);
 
 function headCenter(pitch: number, seat: number): Point {
   const c = Math.cos(pitch), s = Math.sin(pitch);
@@ -39,9 +33,10 @@ function headCenter(pitch: number, seat: number): Point {
 
 export function closingFrame(frame: number) {
   const wide = frame < edit[1].start;
+  const reconnecting = frame >= edit[2].start;
   const phase = (a:number,b:number) => smooth((frame-a)/(b-a));
   const overview = phase(edit[0].start,edit[0].end-1);
-  const focus = phase(edit[1].start+24,finalTiming.blackout);
+  const focus = phase(edit[1].start+24,edit[2].start);
   const lean = .054+.038*focus;
   const time = frame/closingFps;
   const breath = .0035*Math.sin(time*2.4);
@@ -67,15 +62,45 @@ export function closingFrame(frame: number) {
     ? [establish.camera[0]-.27*overview,establish.camera[1]-.057*overview,establish.camera[2]-.029*overview]
     : eye;
   const cue = narration.find(c=>frame>=c.start&&frame<c.start+c.frames);
-  return {
+  const base = {
     time, camera, target: wide ? establish.target : povTarget,
     interrogator: [lean+breath,0,-lean+.018,0] as const,
     protagonist: [studentLean,studentYaw,studentPitch,0] as const,
     hands: [0,0] as const,
-    pov: !wide,
     caption: cue?.text ?? '',
-    ambientDim: .19*phase(finalTiming.dimStart,finalTiming.blackout-9),
-    black: phase(finalTiming.fadeStart,finalTiming.blackout),
-    question: phase(finalTiming.questionStart,finalTiming.questionFull),
+    captionOpacity: 1,
+    closingArms: 1,
+  };
+  if (!reconnecting) return base;
+
+  // Ease into the actual opening pose. Wind the procedural time forward
+  // through zero to carry the same breathing and hand motion over the edit.
+  const settle = phase(edit[2].start,closingFrames-1);
+  const motionTime = (frame-(closingFrames-1))/closingFps;
+  const breathAtJoin = Math.sin(motionTime*2.05);
+  const matchPose = (a: readonly [number,number,number,number],
+    b: readonly [number,number,number,number]) =>
+    [a[0]+(b[0]-a[0])*settle,a[1]+(b[1]-a[1])*settle,
+      a[2]+(b[2]-a[2])*settle,a[3]+(b[3]-a[3])*settle] as const;
+  return {
+    ...base,
+    time: motionTime,
+    camera: [
+      opening.camera[0]-.27*(1-settle),
+      opening.camera[1]-.057*(1-settle),
+      opening.camera[2]-.029*(1-settle),
+    ] as Point,
+    target: opening.target,
+    interrogator: matchPose(base.interrogator,[
+      opening.interrogator[0]+.006*breathAtJoin,opening.interrogator[1]+.012*breathAtJoin,
+      opening.interrogator[2],opening.interrogator[3],
+    ]),
+    protagonist: matchPose([studentLean,studentYaw,.19,0],[
+      opening.protagonist[0]+.008*breathAtJoin,opening.protagonist[1]+.011*breathAtJoin,
+      opening.protagonist[2],opening.protagonist[3],
+    ]),
+    hands: opening.hands,
+    captionOpacity: 1-phase(closingFrames-7,closingFrames-1),
+    closingArms: 1-settle,
   };
 }

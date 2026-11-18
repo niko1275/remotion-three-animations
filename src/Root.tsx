@@ -1,3 +1,4 @@
+import {PruebaLoop, loopPreviewFrames} from './scenes/el-cierre/PruebaLoop';
 import {ElCierre} from './scenes/el-cierre/ElCierre';
 import {closingFps, closingFrames} from './scenes/el-cierre/timeline';
 import {LosResultados} from './scenes/los-resultados/LosResultados';
@@ -33,6 +34,7 @@ export const Root = () => <>
     <Composition id="ElFalsoRecuerdo" component={ElFalsoRecuerdo} durationInFrames={memoryFrames} fps={memoryFps} width={1080} height={1920}/>
     <Composition id="LosResultados" component={LosResultados} durationInFrames={resultsFrames} fps={resultsFps} width={1080} height={1920}/>
     <Composition id="ElCierre" component={ElCierre} durationInFrames={closingFrames} fps={closingFps} width={1080} height={1920}/>
+    <Composition id="PruebaLoop" component={PruebaLoop} durationInFrames={loopPreviewFrames} fps={closingFps} width={1080} height={1920}/>
     <Composition id="EfectoFoco" component={EfectoFoco} durationInFrames={210} fps={30} width={540} height={960}/>
     <Composition id="HospitalStory" component={StoryShort} durationInFrames={450} fps={30} width={1080} height={1920} defaultProps={{lighting:'night' as const}}/>
     <Composition id="ProtagonistActions" component={CharacterShowcase} durationInFrames={720} fps={30} width={1080} height={1920}/>

@@ -1,7 +1,7 @@
 import {seatedBody, seatedDimensions, seatedTransforms} from '../seatedActor';
 import {forms, hair, lighting} from '../efecto-foco/shaderParts';
 
-export function makeAccusationShader(parts: {arms?: string} = {}) {
+export function makeAccusationShader(parts: {arms?: string; declarations?: string} = {}) {
   return `
 precision highp float;
 uniform vec2 R, HANDS;
@@ -9,7 +9,7 @@ uniform float T;
 uniform vec3 CAM, TA;
 // Each actor supplies torso pitch, head yaw, head pitch and mouth opening.
 uniform vec4 INTERROGATOR, PROTAGONIST;
-float NOL = 0.;
+${parts.declarations ?? ''}float NOL = 0.;
 ${forms}
 ${hair}
 

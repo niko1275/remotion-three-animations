@@ -21,9 +21,7 @@ type Shot = {
 export const accusationFps = 30;
 export const shots: Shot[] = [
   {id: 'general', frames: 42, camera: [4.73, 1.86, .40], target: [0, 1.18, 0]},
-  {id: 'investigador', frames: 93, camera: [.61, 1.57, .53], target: [0, 1.32, -.92],
-    dialogue: {speaker: 'interrogador', offset: 11, frames: 68, pause: [19, 25],
-      text: 'Fuiste tú. Presionaste la tecla.'}},
+  {id: 'investigador', frames: 93, camera: [.61, 1.57, .53], target: [0, 1.32, -.92]},
   {id: 'estudiante', frames: 96, camera: [.58, 1.54, -.54], target: [0, 1.32, .99],
     dialogue: {speaker: 'protagonista', offset: 14, frames: 72, pause: [7, 14],
       text: 'No. Estoy seguro de que no fui yo.'}},
@@ -62,7 +60,11 @@ const edit = shots.map(shot => {
 
 export const accusationFrames = nextCut;
 // Absolute frame positions for an editor or a future audio Sequence.
-export const accusationCues = edit.flatMap(({id, cue}) => cue ? [{shot: id, ...cue}] : []);
+const openingDialogue = {
+  shot: 'general', speaker: 'interrogador', offset: 0, start: 0, frames: 68, end: 68,
+  pause: [19,25], text: 'Fuiste tú. Presionaste la tecla.',
+} as const;
+export const accusationCues = [openingDialogue, ...edit.flatMap(({id, cue}) => cue ? [{shot: id, ...cue}] : [])];
 
 function articulation(frame: number, start: number, end: number) {
   if (frame < start || frame >= end) return 0;
@@ -76,7 +78,7 @@ export function accusationFrame(frame: number) {
   const elapsed = current - shot.start;
   const progress = elapsed / Math.max(1, shot.frames - 1);
   const phase = (a: number, b: number) => smooth((progress - a) / (b - a));
-  const {cue} = shot;
+  const cue = current < openingDialogue.end ? openingDialogue : shot.cue;
   const speaking = cue && current >= cue.start && current < cue.end;
   const pause = cue?.pause && cue.pause.map(offset => cue.start + offset);
   const mouth = !cue ? 0 : pause && current < pause[1]
@@ -102,7 +104,7 @@ export function accusationFrame(frame: number) {
     time,
     camera,
     target: shot.target,
-    caption: speaking ? cue.text : '',
+    caption: speaking && current >= 3 ? cue.text : '',
     interrogator: [
       lean + .006 * breath + .018 * pressure,
       .012 * breath,

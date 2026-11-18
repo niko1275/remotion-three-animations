@@ -1,3 +1,5 @@
+import {ElExperimento} from './scenes/el-experimento/ElExperimento';
+import {experimentFps, experimentFrames} from './scenes/el-experimento/timeline';
 import {LaAcusacion} from './scenes/la-acusacion/LaAcusacion';
 import {accusationFps, accusationFrames} from './scenes/la-acusacion/timeline';
 import {GraphicCharacterStudy} from './scenes/GraphicCharacterStudy';
@@ -15,6 +17,7 @@ export const Root = () => <>
   </Folder>
   <Folder name="Shorts">
     <Composition id="LaAcusacion" component={LaAcusacion} durationInFrames={accusationFrames} fps={accusationFps} width={540} height={960}/>
+    <Composition id="ElExperimento" component={ElExperimento} durationInFrames={experimentFrames} fps={experimentFps} width={1080} height={1920}/>
     <Composition id="EfectoFoco" component={EfectoFoco} durationInFrames={210} fps={30} width={540} height={960}/>
     <Composition id="HospitalStory" component={StoryShort} durationInFrames={450} fps={30} width={1080} height={1920} defaultProps={{lighting:'night' as const}}/>
     <Composition id="ProtagonistActions" component={CharacterShowcase} durationInFrames={720} fps={30} width={1080} height={1920}/>

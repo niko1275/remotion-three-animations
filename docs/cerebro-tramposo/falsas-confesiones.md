@@ -39,3 +39,18 @@ El render guarda un MP4 sin audio en `out/la-acusacion.mp4`.
 | Sobre el hombro del investigador | 231–354 | 244–327 |
 
 Los intervalos están en fotogramas a 30 fps, con el final excluido. Edita `shots` en `src/scenes/la-acusacion/timeline.ts` para ajustar la duración de cada plano y el texto, inicio y duración de las intervenciones. El inicio de cada intervención se mide desde el corte. Las pausas de articulación se miden desde el inicio de la intervención. `accusationCues` expone las posiciones absolutas y se actualiza al cambiar las duraciones. Úsalas como puntos de entrada al montar las voces definitivas. El movimiento de boca es provisional y los rótulos permanecen visibles durante las pausas dentro de una frase.
+
+## Escena 2 · El experimento
+
+En **Shorts → ElExperimento** puedes revisar los cuatro planos a 1080 × 1920 y 30 fps. La versión provisional dura 18 segundos, sin audio.
+
+| Plano | Tiempo | Acción |
+| --- | --- | --- |
+| Laboratorio | 0–4 s | Presentación del estudiante, el CRT y el año 1996. |
+| Tarea | 4–9 s | El estudiante escribe y el CRT muestra las letras del ejercicio de dictado. |
+| Regla | 9–14 s | Detalle del teclado con «NO PRESIONAR ALT». |
+| Anticipación | 14–18 s | Últimas pulsaciones en teclas de letras cercanas a ALT y corte directo. |
+
+Edita los planos en `src/scenes/el-experimento/timeline.ts` y las tres intervenciones del narrador en `src/scenes/el-experimento/narration.ts`. Las duraciones se expresan en fotogramas. Las pulsaciones se ajustan a la duración de su plano. Los tiempos de narración son independientes y se pueden reubicar cuando se incorporen las voces.
+
+`npm run render:el-experimento` guarda el MP4 en `out/el-experimento.mp4`. Para una muestra de menor resolución, usa `npm run render:el-experimento -- --width=540 --height=960`.

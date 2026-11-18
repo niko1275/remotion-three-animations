@@ -1,8 +1,11 @@
 import {makeLabShader} from '../el-experimento/shader';
 
-export const trapShader = makeLabShader({
+type TrapShaderParts = Pick<NonNullable<Parameters<typeof makeLabShader>[0]>, 'declarations' | 'figures' | 'map' | 'palette'> & {researcherYaw?: string};
+
+export function makeTrapShader(parts: TrapShaderParts = {}) {
+  return makeLabShader({
   declarations: `uniform float POINT, RESEARCHER_MOUTH, SURPRISE, SCREEN_LEVEL, RESEARCHER_PRESENT;
-`,
+${parts.declarations ?? ''}`,
   figures: `
 // Same seated head and shirt proportions as the investigator in La acusación.
 // Only the pelvis is raised and the original trouser and shoe shapes stand upright.
@@ -11,7 +14,7 @@ vec3 researcherSpace(vec3 p) {
   p -= RESEARCHER;
   return vec3(p.z,p.y,-p.x);
 }
-vec4 researcherPose() { return vec4(.04+.10*POINT,-.22,-.06,RESEARCHER_MOUTH); }
+vec4 researcherPose() { return vec4(.04+.10*POINT,${parts.researcherYaw ?? '-.22'},-.06,RESEARCHER_MOUTH); }
 
 vec2 investigator(vec3 p) {
   float d = 100., id = 10., offset = 6.;
@@ -43,7 +46,7 @@ vec2 investigator(vec3 p) {
   }
   return vec2(d,id);
 }
-`,
+${parts.figures ?? ''}`,
   map: `  vec3 person = researcherSpace(p);
   float personBounds = rbox(person,vec3(0.,.93,-.163),vec3(.42,.94,.52),0.);
   if (RESEARCHER_PRESENT > .5 && personBounds < d) {
@@ -53,7 +56,7 @@ vec2 investigator(vec3 p) {
       NEAR(figure.x,figure.y)
     }
   }
-`,
+${parts.map ?? ''}`,
   palette: `  if (id == 10.) return vec3(.45,.55,.66);
   if (id == 12.) return vec3(.30,.30,.37);
   if (id == 14.) return vec3(.30,.20,.14);
@@ -67,8 +70,11 @@ vec2 investigator(vec3 p) {
     }
     return vec3(.82,.63,.50);
   }
-`,
+${parts.palette ?? ''}`,
   studentEyes: 'eye(h,0.) || (SURPRISE > .001 && dot(normalize(h), normalize(vec3(sign(h.x)*.4,-.06,-1.))) > .98-.007*SURPRISE)',
   studentMouth: '.035+.035*SURPRISE+.080*STUDENT.w',
   screen: '    color *= SCREEN_LEVEL;\n',
 });
+}
+
+export const trapShader = makeTrapShader();

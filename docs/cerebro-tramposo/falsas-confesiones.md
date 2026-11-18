@@ -67,3 +67,16 @@ Abre **Shorts → LaTrampa** en Studio. La escena provisional dura 18 segundos, 
 | Revelación | 13–18 s | La cámara avanza sobre ALT en reposo. La narración revela la falsa acusación antes del fundido a negro. |
 
 En `src/scenes/la-trampa/timeline.ts` se editan por separado los planos, los inicios de las acciones, los diálogos y la narración. Los tiempos de sincronización están en fotogramas. El render con `npm run render:la-trampa` se guarda en `out/la-trampa.mp4`.
+
+## Escena 4 · El falso testigo
+
+Abre **Shorts → ElFalsoTestigo** en Studio. La composición dura 15 segundos a 1080 × 1920 y 30 fps. Las intervenciones se muestran como rótulos y la escena está preparada para incorporar audio más adelante.
+
+| Plano | Tiempo | Acción |
+| --- | --- | --- |
+| Investigador | 0–3 s | El investigador dirige la atención a la testigo. El estudiante sigue sentado. |
+| Testigo | 3–6 s | Desde el fondo del laboratorio, la testigo confirma la acusación con un asentimiento breve. |
+| Reacción | 6–10 s | El estudiante levanta la mirada y retira ligeramente las manos mientras escucha. |
+| Duda | 10–15 s | La mirada baja hacia el teclado y la cámara se acerca. |
+
+Los textos están en `src/scenes/el-falso-testigo/script.ts`. En `timeline.ts` están las duraciones de los planos y los tiempos independientes de diálogo, narración y acciones, en fotogramas. `Testigo.ts` contiene la geometría procedural del nuevo personaje. Para exportar un MP4, usa `npm run render:el-falso-testigo`.

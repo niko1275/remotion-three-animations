@@ -1,3 +1,5 @@
+import {ElFalsoTestigo} from './scenes/el-falso-testigo/ElFalsoTestigo';
+import {witnessFps, witnessFrames} from './scenes/el-falso-testigo/timeline';
 import {LaTrampa} from './scenes/la-trampa/LaTrampa';
 import {trapFps, trapFrames} from './scenes/la-trampa/timeline';
 import {ElExperimento} from './scenes/el-experimento/ElExperimento';
@@ -21,6 +23,7 @@ export const Root = () => <>
     <Composition id="LaAcusacion" component={LaAcusacion} durationInFrames={accusationFrames} fps={accusationFps} width={540} height={960}/>
     <Composition id="ElExperimento" component={ElExperimento} durationInFrames={experimentFrames} fps={experimentFps} width={1080} height={1920}/>
     <Composition id="LaTrampa" component={LaTrampa} durationInFrames={trapFrames} fps={trapFps} width={1080} height={1920}/>
+    <Composition id="ElFalsoTestigo" component={ElFalsoTestigo} durationInFrames={witnessFrames} fps={witnessFps} width={1080} height={1920}/>
     <Composition id="EfectoFoco" component={EfectoFoco} durationInFrames={210} fps={30} width={540} height={960}/>
     <Composition id="HospitalStory" component={StoryShort} durationInFrames={450} fps={30} width={1080} height={1920} defaultProps={{lighting:'night' as const}}/>
     <Composition id="ProtagonistActions" component={CharacterShowcase} durationInFrames={720} fps={30} width={1080} height={1920}/>

@@ -11,6 +11,7 @@
     "render:la-acusacion": "remotion render src/index.ts LaAcusacion out/la-acusacion.mp4 --gl=swangle",
     "render:el-experimento": "remotion render src/index.ts ElExperimento out/el-experimento.mp4 --gl=swangle",
     "render:la-trampa": "remotion render src/index.ts LaTrampa out/la-trampa.mp4 --gl=swangle",
+    "render:el-falso-testigo": "remotion render src/index.ts ElFalsoTestigo out/el-falso-testigo.mp4 --gl=swangle",
     "render:hospital": "remotion render src/index.ts Hospital out/hospital.mp4 --gl=angle",
     "render:workshop": "remotion render src/index.ts Workshop out/workshop.mp4 --gl=angle",
     "still:hospital": "remotion still src/index.ts Hospital out/hospital.png --frame=90 --gl=angle",

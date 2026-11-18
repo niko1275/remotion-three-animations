@@ -7,7 +7,7 @@ import {trapFrame} from './timeline';
 
 const fragmentShader = toLabFragmentShader(trapShader);
 
-function makeDisplay(mode: string, text: string) {
+export function makeTrapDisplay(mode: string, text: string) {
   return canvasTexture(512, 352, context => {
     context.fillStyle = '#fff';
     context.font = '700 25px monospace';
@@ -43,7 +43,7 @@ function makeDisplay(mode: string, text: string) {
 
 export function LaTrampa() {
   const state = trapFrame(useCurrentFrame());
-  const display = useMemo(() => makeDisplay(state.displayMode,state.letters), [state.displayMode,state.letters]);
+  const display = useMemo(() => makeTrapDisplay(state.displayMode,state.letters), [state.displayMode,state.letters]);
   useEffect(() => () => display.dispose(),[display]);
 
   return <LabStage shot={state} motion={state.motion} rule={state.rule}

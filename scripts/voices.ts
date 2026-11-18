@@ -1,3 +1,5 @@
+import {ElevenLabsClient, ElevenLabsError} from '@elevenlabs/elevenlabs-js';
+import {config as loadEnv} from 'dotenv';
 import {createHash,randomUUID} from 'node:crypto';
 import {mkdir,open,readFile,rename,rm,writeFile} from 'node:fs/promises';
 import {parseArgs} from 'node:util';
@@ -41,13 +43,13 @@ async function writeJson(file: string,value: unknown) {
 
 type Alignment = {
   characters: string[];
-  character_start_times_seconds: number[];
-  character_end_times_seconds: number[];
+  characterStartTimesSeconds: number[];
+  characterEndTimesSeconds: number[];
 };
 
 function alignmentWords(value: Alignment | null | undefined) {
   if (!value) return [];
-  const {characters,character_start_times_seconds: starts,character_end_times_seconds: ends}=value;
+  const {characters,characterStartTimesSeconds: starts,characterEndTimesSeconds: ends}=value;
   if (!Array.isArray(characters)||!Array.isArray(starts)||!Array.isArray(ends)
     ||starts.length!==characters.length||ends.length!==characters.length) {
     throw new Error('ElevenLabs devolvió timestamps incompletos.');
@@ -180,29 +182,30 @@ async function main() {
       words=values.words?await json<TimedWord[]>(values.words):[];
     } else {
       if(values.words) throw new Error('--words se usa al importar MP3 locales.');
-      const apiKey=process.env.ELEVENLABS_API_KEY;
-      if(!apiKey) throw new Error('Falta ELEVENLABS_API_KEY en el entorno de Node.');
+      loadEnv({path: '.env.local', quiet: true});
+      if (!process.env.ELEVENLABS_API_KEY?.trim()) {
+        throw new Error('Falta ELEVENLABS_API_KEY en el entorno de Node o en .env.local.');
+      }
       const config = await loadVoiceConfig();
       const voiceId = config.voiceIds[cue.role];
-      let response: Response;
-      try {
-        response=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}/with-timestamps?output_format=mp3_44100_128`,{
-          method:'POST',signal:AbortSignal.timeout(60_000),
-          headers:{'content-type':'application/json','xi-api-key':apiKey},
-          body:JSON.stringify({text:cue.text,model_id:config.modelId,
-            ...(config.modelId==='eleven_multilingual_v2'?{}:{language_code:'es'})}),
-        });
-      } catch {
-        throw new Error('Error de red o tiempo de espera de ElevenLabs. Revisa el historial antes de reintentar.');
-      }
-      if(!response.ok) throw new Error(`ElevenLabs respondió HTTP ${response.status} ${response.statusText}. Referencia: ${response.headers.get('request-id')??'sin referencia'}.`);
-      const body=await response.json() as {audio_base64?:string;alignment?:Alignment|null;normalized_alignment?:Alignment|null};
-      if(typeof body.audio_base64!=='string'||!body.audio_base64) throw new Error('ElevenLabs no devolvió audio MP3.');
-      mp3=Buffer.from(body.audio_base64,'base64');
+      const client = new ElevenLabsClient();
+      const body = await client.textToSpeech.convertWithTimestamps(voiceId, {
+        text: cue.text,
+        modelId: config.modelId,
+        outputFormat: 'mp3_44100_128',
+        ...(config.modelId === 'eleven_multilingual_v2' ? {} : {languageCode: 'es'}),
+      }, {timeoutInSeconds: 60, maxRetries: 0}).catch((error: unknown) => {
+        if (error instanceof ElevenLabsError && error.statusCode) {
+          throw new Error(`ElevenLabs respondió HTTP ${error.statusCode}. Referencia: ${error.requestId ?? 'sin referencia'}.`);
+        }
+        throw new Error('Error de red o respuesta de ElevenLabs. Revisa el historial antes de reintentar.');
+      });
+      if (!body.audioBase64) throw new Error('ElevenLabs no devolvió audio MP3.');
+      mp3 = Buffer.from(body.audioBase64, 'base64');
       // Keep a recoverable local copy of a successful paid response before validating it.
       recovery=`${workDir}/${cue.id}-${randomUUID()}`;
       await writeFile(`${recovery}.mp3`,mp3,{flag:'wx'});
-      await writeJson(`${recovery}.json`,{alignment:body.alignment,normalizedAlignment:body.normalized_alignment,
+      await writeJson(`${recovery}.json`,{alignment:body.alignment,normalizedAlignment:body.normalizedAlignment,
         modelId:config.modelId,voiceId});
       console.log(`Respuesta guardada en ${recovery}.mp3`);
       try {

@@ -59,7 +59,7 @@ Las cuatro voces del proyecto están en [configs/voices.ts](../../configs/voices
 
 Ejecuta `npm run voices -- plan` para revisar las tres intervenciones de la escena 1, sus voces, planos y gestos. Este comando funciona sin clave y sin llamar a ElevenLabs.
 
-Cuando autorices la generación, define `ELEVENLABS_API_KEY` en el entorno local de Node y ejecuta un comando por intervención desde CMD.
+Cuando autorices la generación, guarda `ELEVENLABS_API_KEY` en `.env.local` o defínela en el entorno local de Node y ejecuta un comando por intervención desde CMD.
 
 ```cmd
 npm run voices -- generate s1-01 --confirm-paid
@@ -67,6 +67,6 @@ npm run voices -- generate s1-02 --confirm-paid
 npm run voices -- generate s1-03 --confirm-paid
 ```
 
-Cada comando genera un MP3 local y guarda los timestamps disponibles en el manifiesto. La clave solo la lee el proceso de Node. El script no carga `.env` automáticamente y no incluye la clave en el navegador. Para revisar las tomas, abre **Shorts → LaAcusacionVoces**. Si quieres probar la unión con ambas voces, importa una toma local para `s7-03` o autoriza su generación por separado.
+Cada comando genera un MP3 local y guarda los timestamps disponibles en el manifiesto. La clave solo la lee el proceso de Node. Solo el comando de generación carga `.env.local` y una variable del entorno tiene prioridad. Studio no necesita la clave. Para revisar las tomas, abre **Shorts → LaAcusacionVoces**. Si quieres probar la unión con ambas voces, importa una toma local para `s7-03` o autoriza su generación por separado.
 
-La generación usa el endpoint oficial con timestamps. Guarda el MP3 por intervención y la alineación de palabras disponible. Las respuestas exitosas se respaldan con su alineación original en `.voice-work/` para que una validación fallida no obligue a pagar otra vez. Ante un error de red, revisa el historial antes de reintentar. [API de ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps)
+La generación usa el SDK oficial con timestamps y desactiva los reintentos automáticos. Guarda el MP3 por intervención y la alineación de palabras disponible. Las respuestas exitosas se respaldan con su alineación original en `.voice-work/` para que una validación fallida no obligue a pagar otra vez. Ante un error de red, revisa el historial antes de reintentar. [API de ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps)

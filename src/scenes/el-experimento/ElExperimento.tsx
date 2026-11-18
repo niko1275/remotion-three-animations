@@ -1,5 +1,5 @@
 import {ThreeCanvas} from '@remotion/three';
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, type ReactNode} from 'react';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import {CanvasTexture, GLSL3, LinearFilter, Vector2, Vector3, Vector4} from 'three';
 import {FocoCaption, FocoGrain} from '../efecto-foco/overlays';
@@ -10,10 +10,14 @@ import {armPose} from './armPose';
 
 const vertexShader = `in vec3 position;
 void main() { gl_Position = vec4(position.xy, 0., 1.); }`;
-const fragmentShader = experimentShader.replace('precision highp float;',
-  'precision highp float;\nout vec4 outputColor;\n#define gl_FragColor outputColor\n');
+export function toLabFragmentShader(shader: string) {
+  return shader.replace('precision highp float;',
+    'precision highp float;\nout vec4 outputColor;\n#define gl_FragColor outputColor\n');
+}
 
-function canvasTexture(width: number, height: number, paint: (context: CanvasRenderingContext2D) => void) {
+const fragmentShader = toLabFragmentShader(experimentShader);
+
+export function canvasTexture(width: number, height: number, paint: (context: CanvasRenderingContext2D) => void) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -62,15 +66,22 @@ function makeDisplay(letters: string) {
   });
 }
 
-export function ElExperimento() {
-  const frame = useCurrentFrame();
+type LabShot = Pick<ReturnType<typeof experimentFrame>, 'camera' | 'target' | 'time' | 'withdrawal'> & {pose: readonly [number, number, number, number]};
+
+export function LabStage({shot, motion, rule, shader = fragmentShader, displayTexture, extraUniforms, children}: {
+  shot: LabShot;
+  motion: ReturnType<typeof typingFrame>;
+  rule: boolean;
+  shader?: string;
+  displayTexture?: CanvasTexture;
+  extraUniforms?: Record<string, {value: unknown}>;
+  children?: ReactNode;
+}) {
   const {width, height} = useVideoConfig();
-  const shot = experimentFrame(frame);
-  const motion = typingFrame(frame);
   const legends = useMemo(makeLegends, []);
-  const display = useMemo(() => makeDisplay(motion.text), [motion.text]);
+  const display = useMemo(() => displayTexture ? null : makeDisplay(motion.text), [displayTexture, motion.text]);
   useEffect(() => () => legends.dispose(), [legends]);
-  useEffect(() => () => display.dispose(), [display]);
+  useEffect(() => () => display?.dispose(), [display]);
   const {stroke, travel} = motion;
   const left = armPose(true, motion, shot.time, shot.withdrawal, shot.pose[0]);
   const right = armPose(false, motion, shot.time, shot.withdrawal, shot.pose[0]);
@@ -78,7 +89,7 @@ export function ElExperimento() {
   const uniforms = {
     R: {value: new Vector2(width, height)},
     T: {value: shot.time},
-    RULE: {value: shot.shot === 'regla' ? 1 : 0},
+    RULE: {value: rule ? 1 : 0},
     CAM: {value: new Vector3(...shot.camera)},
     TA: {value: new Vector3(...shot.target)},
     STUDENT: {value: new Vector4(...shot.pose)},
@@ -92,19 +103,28 @@ export function ElExperimento() {
     LEFT_HAND: {value: left.wrist},
     RIGHT_HAND: {value: right.wrist},
     LEGENDS: {value: legends},
-    DISPLAY: {value: display},
+    DISPLAY: {value: displayTexture ?? display},
+    ...extraUniforms,
   };
 
   return <AbsoluteFill style={{background: '#1c1714', overflow: 'hidden'}}>
     <ThreeCanvas width={width} height={height} dpr={1} frameloop="demand" gl={{antialias: false}}>
       <mesh frustumCulled={false}>
         <planeGeometry args={[2, 2]} />
-        <rawShaderMaterial vertexShader={vertexShader} fragmentShader={fragmentShader}
+        <rawShaderMaterial vertexShader={vertexShader} fragmentShader={shader}
           uniforms={uniforms} glslVersion={GLSL3} depthTest={false} depthWrite={false} />
       </mesh>
     </ThreeCanvas>
     <FocoGrain />
+    {children}
+  </AbsoluteFill>;
+}
+
+export function ElExperimento() {
+  const frame = useCurrentFrame();
+  const shot = experimentFrame(frame);
+  return <LabStage shot={shot} motion={typingFrame(frame)} rule={shot.shot === 'regla'}>
     {shot.shot === 'laboratorio' && shot.local >= 25 && shot.local < 108 && <FocoCaption top="16%">1996</FocoCaption>}
     {shot.shot === 'regla' && shot.local >= 20 && <FocoCaption top="78%">NO PRESIONAR ALT</FocoCaption>}
-  </AbsoluteFill>;
+  </LabStage>;
 }

@@ -14,7 +14,18 @@ const rowLookup = Array.from({length: 5}, (_, row) => {
   }`;
 }).join('\n  ');
 
-export const experimentShader = `
+type LabShaderParts = {
+  declarations?: string;
+  figures?: string;
+  map?: string;
+  palette?: string;
+  studentEyes?: string;
+  studentMouth?: string;
+  screen?: string;
+};
+
+export function makeLabShader(parts: LabShaderParts = {}) {
+  return `
 precision highp float;
 uniform vec2 R, PRESS;
 uniform float T, RULE;
@@ -23,7 +34,7 @@ uniform vec2 REACH, WRIST_YAW;
 uniform vec3 LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_ELBOW, RIGHT_ELBOW;
 uniform vec4 STUDENT;
 uniform sampler2D LEGENDS, DISPLAY;
-float NOL = 0.;
+${parts.declarations ?? ''}float NOL = 0.;
 ${forms}
 ${hair}
 ${seatedDimensions}
@@ -94,7 +105,7 @@ ${seatedBody}
   return vec2(d,id);
 }
 
-vec2 map(vec3 p) {
+${parts.figures ?? ''}vec2 map(vec3 p) {
   float d = p.y, id = 0.;
   NEAR(min(min(4.2-abs(p.x),3.25-abs(p.z)),2.95-p.y),2.)
   NEAR(rbox(p,vec3(0.,.91,.35),vec3(.68,.045,.57),.024),1.)
@@ -132,12 +143,12 @@ vec2 map(vec3 p) {
       NEAR(actor.x,actor.y)
     }
   }
-  return vec2(d,id);
+${parts.map ?? ''}  return vec2(d,id);
 }
 ${lighting}
 
 vec3 palette(vec3 p, float id, vec3 ink) {
-  if (id == 0.) {
+${parts.palette ?? ''}  if (id == 0.) {
     vec3 wood = vec3(.78,.68,.55);
     return abs(fract(p.z/.7)-.5) > .485 ? wood*.86 : wood;
   }
@@ -160,9 +171,9 @@ vec3 palette(vec3 p, float id, vec3 ink) {
   }
   vec3 h = headSpace(p-SEAT,STUDENT);
   if (id == 5. && length(h) < .21) {
-    if (eye(h,0.)) return ink;
+    if (${parts.studentEyes ?? 'eye(h,0.)'}) return ink;
     vec3 mouth = normalize(h);
-    if (mouth.z < 0. && length((mouth.xy-vec2(0.,-.40))/vec2(.20,.035)) < 1.) return ink;
+    if (mouth.z < 0. && length((mouth.xy-vec2(0.,-.40))/vec2(.20,${parts.studentMouth ?? '.035'})) < 1.) return ink;
   }
   return vec3(.90,.72,.58);
 }
@@ -198,7 +209,7 @@ void main() {
     float text = texture(DISPLAY,uv).a;
     color = mix(vec3(.095,.164,.137),vec3(.72,.83,.63),text);
     color *= .945+.055*sin(uv.y*480.);
-  }
+${parts.screen ?? ''}  }
   if (base == ink || edge > .5) color = ink*mix(.60,1.,fall*pool);
   if (hit.y == 17.) color = base;
   vec2 grain = rot(.6)*fc*(540./R.x);
@@ -207,3 +218,6 @@ void main() {
   gl_FragColor = vec4(color,1.);
 }
 `;
+}
+
+export const experimentShader = makeLabShader();

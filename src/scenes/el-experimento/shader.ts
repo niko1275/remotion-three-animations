@@ -18,7 +18,8 @@ precision highp float;
 uniform vec2 R, PRESS;
 uniform float T, RULE;
 uniform vec3 CAM, TA, LEFT_HAND, RIGHT_HAND;
-uniform vec2 REACH;
+uniform vec2 REACH, WRIST_YAW;
+uniform vec3 LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_ELBOW, RIGHT_ELBOW;
 uniform vec4 STUDENT;
 uniform sampler2D LEGENDS, DISPLAY;
 float NOL = 0.;
@@ -67,20 +68,22 @@ ${seatedBody}
     float side = i == 0 ? -1. : 1.;
     float reach = i == 0 ? REACH.x : REACH.y;
     vec3 wrist = i == 0 ? LEFT_HAND : RIGHT_HAND;
-    vec3 shoulder = vec3(side*.218,1.02,-.13)-HIP;
-    shoulder.yz = rot(pose.x)*shoulder.yz;
-    shoulder += HIP;
-    // Keep the elbow outside the torso, then narrow the sleeve into the wrist.
-    vec3 elbow = vec3(side*.294,.995,-.240) + vec3(wrist.x*.12,reach*.008,-reach*.016);
-    vec3 forearm = mix(elbow,wrist,.52);
-    vec3 cuff = mix(elbow,wrist,.90);
-    NEAR(cap(p,shoulder,elbow,.059),4.)
-    NEAR(min(cap(p,elbow,forearm,.047),cap(p,forearm,cuff,.038)),4.)
+    vec3 shoulder = i == 0 ? LEFT_SHOULDER : RIGHT_SHOULDER;
+    vec3 elbow = i == 0 ? LEFT_ELBOW : RIGHT_ELBOW;
+    float yaw = i == 0 ? WRIST_YAW.x : WRIST_YAW.y;
+    vec3 upper = mix(shoulder,elbow,.45);
+    vec3 forearm = mix(elbow,wrist,.46);
+    vec3 cuff = mix(elbow,wrist,.91);
+    NEAR(min(cap(p,shoulder,upper,.069),cap(p,upper,elbow,.054)),4.)
+    NEAR(min(cap(p,elbow,forearm,.046),cap(p,forearm,cuff,.037)),4.)
     NEAR(cap(p,cuff,wrist,.027),9.)
-    float bounds = rbox(p,wrist+vec3(0.,-.005,-.065),vec3(.075,.055,.112),0.);
+    vec3 handSpace = p-wrist;
+    handSpace.xz = rot(-yaw)*handSpace.xz;
+    handSpace += wrist;
+    float bounds = rbox(handSpace,wrist+vec3(0.,-.005,-.065),vec3(.075,.055,.112),0.);
     if (bounds < d) {
       if (bounds > .025) d = bounds;
-      else { NEAR(fingers(p,wrist,side,reach),9.) }
+      else { NEAR(fingers(handSpace,wrist,side,reach),9.) }
     }
   }
   return vec2(d,id);
@@ -116,7 +119,7 @@ vec2 map(vec3 p) {
   }
 
   vec3 v = p-SEAT;
-  float bound = rbox(v,vec3(0.,.83,-.35),vec3(.43,.84,.86),0.);
+  float bound = rbox(v,vec3(0.,.83,-.35),vec3(.57,.84,.86),0.);
   if (bound < d) {
     if (bound > .065) d = bound;
     else {

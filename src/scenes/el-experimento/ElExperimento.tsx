@@ -5,7 +5,8 @@ import {CanvasTexture, GLSL3, LinearFilter, Vector2, Vector3, Vector4} from 'thr
 import {FocoCaption, FocoGrain} from '../efecto-foco/overlays';
 import {keys, keyboardDepth, keyboardWidth, keyboardZ} from './keyboard';
 import {experimentShader} from './shader';
-import {experimentFrame, studentZ, typingFrame} from './timeline';
+import {experimentFrame, typingFrame} from './timeline';
+import {armPose} from './armPose';
 
 const vertexShader = `in vec3 position;
 void main() { gl_Position = vec4(position.xy, 0., 1.); }`;
@@ -61,24 +62,6 @@ function makeDisplay(letters: string) {
   });
 }
 
-function wrist(left: boolean, motion: ReturnType<typeof typingFrame>, time: number, withdrawal: number) {
-  const side = left ? -1 : 1;
-  const restX = side * (.134 + .026 * withdrawal);
-  const restY = 1.053 + .002 * Math.sin(time * 2.4 + side);
-  const restZ = keyboardZ + .232 + .065 * withdrawal - studentZ;
-  const {stroke, reach, travel} = motion;
-  if (!stroke || stroke.left !== left) return new Vector3(restX, restY, restZ);
-  const {key} = stroke;
-  const x = key.x + side * .026;
-  const y = 1.041 - .010 * travel;
-  const z = key.z + .135 - studentZ;
-  return new Vector3(
-    restX + (x - restX) * reach,
-    restY + (y - restY) * reach,
-    restZ + (z - restZ) * reach,
-  );
-}
-
 export function ElExperimento() {
   const frame = useCurrentFrame();
   const {width, height} = useVideoConfig();
@@ -88,7 +71,9 @@ export function ElExperimento() {
   const display = useMemo(() => makeDisplay(motion.text), [motion.text]);
   useEffect(() => () => legends.dispose(), [legends]);
   useEffect(() => () => display.dispose(), [display]);
-  const {stroke, reach, travel} = motion;
+  const {stroke, travel} = motion;
+  const left = armPose(true, motion, shot.time, shot.withdrawal, shot.pose[0]);
+  const right = armPose(false, motion, shot.time, shot.withdrawal, shot.pose[0]);
 
   const uniforms = {
     R: {value: new Vector2(width, height)},
@@ -98,9 +83,14 @@ export function ElExperimento() {
     TA: {value: new Vector3(...shot.target)},
     STUDENT: {value: new Vector4(...shot.pose)},
     PRESS: {value: new Vector2(stroke?.key.id ?? -1, travel * .009)},
-    REACH: {value: new Vector2(stroke?.left ? reach : 0, stroke && !stroke.left ? reach : 0)},
-    LEFT_HAND: {value: wrist(true, motion, shot.time, shot.withdrawal)},
-    RIGHT_HAND: {value: wrist(false, motion, shot.time, shot.withdrawal)},
+    REACH: {value: new Vector2(left.reach, right.reach)},
+    WRIST_YAW: {value: new Vector2(left.yaw, right.yaw)},
+    LEFT_SHOULDER: {value: left.shoulder},
+    RIGHT_SHOULDER: {value: right.shoulder},
+    LEFT_ELBOW: {value: left.elbow},
+    RIGHT_ELBOW: {value: right.elbow},
+    LEFT_HAND: {value: left.wrist},
+    RIGHT_HAND: {value: right.wrist},
     LEGENDS: {value: legends},
     DISPLAY: {value: display},
   };

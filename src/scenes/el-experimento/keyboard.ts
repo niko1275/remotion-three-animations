@@ -1,5 +1,5 @@
 export const keyboardX = 0;
-export const keyboardZ = -.51;
+export const keyboardZ = .51;
 export const keyPitch = .042;
 const rows = [
   'ESC 1 2 3 4 5 6 7 8 9 0 - = ⌫',

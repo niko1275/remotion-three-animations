@@ -1,6 +1,7 @@
 import {forms, hair, lighting} from '../efecto-foco/shaderParts';
 import {seatedBody, seatedDimensions, seatedTransforms} from '../seatedActor';
-import {alt, keyboardDepth, keyboardWidth, keys, keyPitch} from './keyboard';
+import {alt, keyboardDepth, keyboardWidth, keys, keyboardZ, keyPitch} from './keyboard';
+import {studentZ} from './timeline';
 
 const rowLookup = Array.from({length: 5}, (_, row) => {
   const group = keys.filter(key => Math.floor(key.id / 16) === row);
@@ -26,9 +27,9 @@ ${hair}
 ${seatedDimensions}
 ${seatedTransforms}
 #define NEAR(distance, material) {float next = distance; if (next < d) {d = next; id = material;}}
-const vec3 SEAT = vec3(0.,0.,1.02);
+const vec3 SEAT = vec3(0.,0.,${studentZ});
 const vec3 LAMP = vec3(0.,2.28,.39);
-const float KEY_Z = .51;
+const float KEY_Z = ${keyboardZ};
 const float KEY_STEP = ${keyPitch};
 const float ALT_ID = ${alt.id}.0;
 
@@ -69,8 +70,13 @@ ${seatedBody}
     vec3 shoulder = vec3(side*.218,1.02,-.13)-HIP;
     shoulder.yz = rot(pose.x)*shoulder.yz;
     shoulder += HIP;
-    vec3 elbow = vec3(side*.273,.955,-.245) + vec3(wrist.x*.15,reach*.015,-reach*.025);
-    NEAR(min(cap(p,shoulder,elbow,.060),cap(p,elbow,wrist,.050)),4.)
+    // Keep the elbow outside the torso, then narrow the sleeve into the wrist.
+    vec3 elbow = vec3(side*.294,.995,-.240) + vec3(wrist.x*.12,reach*.008,-reach*.016);
+    vec3 forearm = mix(elbow,wrist,.52);
+    vec3 cuff = mix(elbow,wrist,.90);
+    NEAR(cap(p,shoulder,elbow,.059),4.)
+    NEAR(min(cap(p,elbow,forearm,.047),cap(p,forearm,cuff,.038)),4.)
+    NEAR(cap(p,cuff,wrist,.027),9.)
     float bounds = rbox(p,wrist+vec3(0.,-.005,-.065),vec3(.075,.055,.112),0.);
     if (bounds < d) {
       if (bounds > .025) d = bounds;
@@ -110,7 +116,7 @@ vec2 map(vec3 p) {
   }
 
   vec3 v = p-SEAT;
-  float bound = rbox(v,vec3(0.,.83,-.19),vec3(.42,.84,.62),0.);
+  float bound = rbox(v,vec3(0.,.83,-.35),vec3(.43,.84,.86),0.);
   if (bound < d) {
     if (bound > .065) d = bound;
     else {

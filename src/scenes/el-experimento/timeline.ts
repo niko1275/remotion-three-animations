@@ -3,9 +3,10 @@ import {alt, keys} from './keyboard';
 
 type Vec3 = [number, number, number];
 export const experimentFps = 30;
+export const studentZ = 1.245;
 export const shots = [
-  {id: 'laboratorio', frames: 120, camera: [2.55,1.77,.69], target: [-.02,1.19,.47], move: [-.22,-.055,-.11]},
-  {id: 'tarea', frames: 150, camera: [1.13,1.61,.80], target: [-.06,1.21,.55], move: [-.035,-.035,-.025]},
+  {id: 'laboratorio', frames: 120, camera: [2.72,1.81,.71], target: [-.02,1.19,.55], move: [-.18,-.045,-.075]},
+  {id: 'tarea', frames: 150, camera: [2.04,1.93,.89], target: [-.035,1.18,.68], move: [-.045,-.026,-.035]},
   {id: 'regla', frames: 150, camera: [-.47,1.50,.72], target: [alt.x+.030,.991,.560], move: [.028,-.035,-.018]},
   {id: 'anticipacion', frames: 120, camera: [-.29,1.42,.48], target: [alt.x+.045,.993,.570], move: [.060,-.054,.014]},
 ] satisfies {id: string; frames: number; camera: Vec3; target: Vec3; move: Vec3}[];
@@ -35,7 +36,7 @@ export function experimentFrame(frame: number) {
     target: shot.target,
     time,
     withdrawal: shot.id === 'regla' ? smooth(ease * 13) * (1 - smooth((ease - .26) / .29)) : 0,
-    pose: [.14 + .009*Math.sin(time*2.1), headYaw + .025*Math.sin(time*.9), headDip + .022*Math.sin(time*1.7), 0] as const,
+    pose: [.062 + .009*Math.sin(time*2.1), headYaw + .025*Math.sin(time*.9), headDip + .022*Math.sin(time*1.7), 0] as const,
   };
 }
 

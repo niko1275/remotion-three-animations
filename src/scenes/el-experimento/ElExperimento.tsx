@@ -5,7 +5,7 @@ import {CanvasTexture, GLSL3, LinearFilter, Vector2, Vector3, Vector4} from 'thr
 import {FocoCaption, FocoGrain} from '../efecto-foco/overlays';
 import {keys, keyboardDepth, keyboardWidth, keyboardZ} from './keyboard';
 import {experimentShader} from './shader';
-import {experimentFrame, typingFrame} from './timeline';
+import {experimentFrame, studentZ, typingFrame} from './timeline';
 
 const vertexShader = `in vec3 position;
 void main() { gl_Position = vec4(position.xy, 0., 1.); }`;
@@ -65,13 +65,13 @@ function wrist(left: boolean, motion: ReturnType<typeof typingFrame>, time: numb
   const side = left ? -1 : 1;
   const restX = side * (.134 + .026 * withdrawal);
   const restY = 1.053 + .002 * Math.sin(time * 2.4 + side);
-  const restZ = -.278 + .065 * withdrawal;
+  const restZ = keyboardZ + .232 + .065 * withdrawal - studentZ;
   const {stroke, reach, travel} = motion;
   if (!stroke || stroke.left !== left) return new Vector3(restX, restY, restZ);
   const {key} = stroke;
   const x = key.x + side * .026;
   const y = 1.041 - .010 * travel;
-  const z = key.z + .135;
+  const z = key.z + .135 - studentZ;
   return new Vector3(
     restX + (x - restX) * reach,
     restY + (y - restY) * reach,

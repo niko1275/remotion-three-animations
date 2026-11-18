@@ -1,0 +1,539 @@
+[
+  {
+    "start": 0,
+    "frames": 68,
+    "text": "Fuiste tú. Presionaste la tecla.",
+    "role": "investigador",
+    "id": "s1-01",
+    "scene": "LaAcusacion",
+    "shots": [
+      "general",
+      "investigador"
+    ],
+    "gestures": [
+      {
+        "label": "Inclinar la cabeza",
+        "sourceFrame": 29,
+        "word": "presionaste"
+      }
+    ],
+    "fps": 30,
+    "startSeconds": 0,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "start": 149,
+    "frames": 72,
+    "text": "No. Estoy seguro de que no fui yo.",
+    "role": "estudiante",
+    "id": "s1-02",
+    "scene": "LaAcusacion",
+    "shots": [
+      "estudiante"
+    ],
+    "gestures": [
+      {
+        "label": "Negar con la cabeza",
+        "sourceFrame": 167,
+        "word": "seguro"
+      }
+    ],
+    "fps": 30,
+    "startSeconds": 4.966666666666667,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "start": 244,
+    "frames": 83,
+    "text": "Entonces, ¿por qué ella dice que te vio hacerlo?",
+    "role": "investigador",
+    "id": "s1-03",
+    "scene": "LaAcusacion",
+    "shots": [
+      "hombro"
+    ],
+    "gestures": [
+      {
+        "label": "Inclinarse sobre la mesa",
+        "sourceFrame": 268,
+        "word": "ella"
+      }
+    ],
+    "fps": 30,
+    "startSeconds": 8.133333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 8,
+    "frames": 149,
+    "text": "En 1996, los psicólogos Saul Kassin y Katherine Kiechel realizaron un experimento inquietante.",
+    "id": "s2-01",
+    "scene": "ElExperimento",
+    "shots": [
+      "laboratorio",
+      "tarea"
+    ],
+    "gestures": [
+      {
+        "label": "Mostrar 1996",
+        "sourceFrame": 25,
+        "word": "1996"
+      }
+    ],
+    "fps": 30,
+    "startSeconds": 0.26666666666666666,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 166,
+    "frames": 128,
+    "text": "Pidieron a varios estudiantes que escribieran en una computadora las letras que otra persona les dictaba.",
+    "id": "s2-02",
+    "scene": "ElExperimento",
+    "shots": [
+      "tarea",
+      "regla"
+    ],
+    "gestures": [
+      {
+        "label": "Comenzar el dictado",
+        "sourceFrame": 170
+      }
+    ],
+    "fps": 30,
+    "startSeconds": 5.533333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 310,
+    "frames": 91,
+    "text": "Solo había una regla: no presionar la tecla ALT.",
+    "id": "s2-03",
+    "scene": "ElExperimento",
+    "shots": [
+      "regla"
+    ],
+    "gestures": [
+      {
+        "label": "Enfocar ALT",
+        "sourceFrame": 310,
+        "word": "alt"
+      }
+    ],
+    "fps": 30,
+    "startSeconds": 10.333333333333334,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "investigador",
+    "start": 221,
+    "frames": 49,
+    "text": "Presionaste la tecla ALT.",
+    "id": "s3-01",
+    "scene": "LaTrampa",
+    "shots": [
+      "acusacion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 7.366666666666666,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "investigador",
+    "start": 280,
+    "frames": 59,
+    "text": "Te advertimos que no lo hicieras.",
+    "id": "s3-02",
+    "scene": "LaTrampa",
+    "shots": [
+      "negacion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 9.333333333333334,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "estudiante",
+    "start": 343,
+    "frames": 43,
+    "text": "¡Pero yo nunca presioné esa tecla!",
+    "id": "s3-03",
+    "scene": "LaTrampa",
+    "shots": [
+      "negacion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 11.433333333333334,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 404,
+    "frames": 65,
+    "text": "Pero había algo que el estudiante no sabía...",
+    "id": "s3-04",
+    "scene": "LaTrampa",
+    "shots": [
+      "revelacion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 13.466666666666667,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 478,
+    "frames": 40,
+    "text": "La acusación era falsa.",
+    "id": "s3-05",
+    "scene": "LaTrampa",
+    "shots": [
+      "revelacion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 15.933333333333334,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "investigador",
+    "start": 21,
+    "frames": 51,
+    "text": "Hay alguien que te vio.",
+    "id": "s4-01",
+    "scene": "ElFalsoTestigo",
+    "shots": [
+      "investigador"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 0.7,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "testigo",
+    "start": 99,
+    "frames": 76,
+    "text": "Sí. Yo lo vi. Presionó esa tecla.",
+    "id": "s4-02",
+    "scene": "ElFalsoTestigo",
+    "shots": [
+      "testigo"
+    ],
+    "gestures": [
+      {
+        "label": "Asentir",
+        "sourceFrame": 105,
+        "word": "sí"
+      }
+    ],
+    "fps": 30,
+    "startSeconds": 3.3,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 184,
+    "frames": 112,
+    "text": "En algunas pruebas, una supuesta testigo aseguró haber visto al estudiante presionar la tecla.",
+    "id": "s4-03",
+    "scene": "ElFalsoTestigo",
+    "shots": [
+      "reaccion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 6.133333333333334,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 304,
+    "frames": 45,
+    "text": "Y entonces, algo comenzó a cambiar.",
+    "id": "s4-04",
+    "scene": "ElFalsoTestigo",
+    "shots": [
+      "duda"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 10.133333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 352,
+    "frames": 96,
+    "text": "El estudiante, que estaba seguro de no haberlo hecho, empezó a dudar.",
+    "id": "s4-05",
+    "scene": "ElFalsoTestigo",
+    "shots": [
+      "duda"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 11.733333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "estudiante",
+    "start": 12,
+    "frames": 23,
+    "text": "Espera...",
+    "id": "s5-01",
+    "scene": "ElFalsoRecuerdo",
+    "shots": [
+      "duda"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 0.4,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "estudiante",
+    "start": 44,
+    "frames": 42,
+    "text": "¿Y si sí fui yo?",
+    "id": "s5-02",
+    "scene": "ElFalsoRecuerdo",
+    "shots": [
+      "duda"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 1.4666666666666666,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "estudiante",
+    "start": 190,
+    "frames": 70,
+    "text": "¿Y si la presioné sin darme cuenta?",
+    "id": "s5-03",
+    "scene": "ElFalsoRecuerdo",
+    "shots": [
+      "fragmento-2"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 6.333333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 364,
+    "frames": 62,
+    "text": "Lo inquietante no era solo que algunos confesaran algo falso.",
+    "id": "s5-04",
+    "scene": "ElFalsoRecuerdo",
+    "shots": [
+      "regreso"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 12.133333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 432,
+    "frames": 48,
+    "text": "Era que algunos empezaban a creerlo.",
+    "id": "s5-05",
+    "scene": "ElFalsoRecuerdo",
+    "shots": [
+      "regreso"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 14.4,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 5,
+    "frames": 48,
+    "text": "Los resultados fueron sorprendentes.",
+    "id": "s6-01",
+    "scene": "LosResultados",
+    "shots": [
+      "confesion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 0.16666666666666666,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 58,
+    "frames": 89,
+    "text": "El 69 % de los estudiantes firmó una confesión falsa.",
+    "id": "s6-02",
+    "scene": "LosResultados",
+    "shots": [
+      "confesion"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 1.9333333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 178,
+    "frames": 105,
+    "text": "El 28 % llegó a asumir una culpa que no tenía.",
+    "id": "s6-03",
+    "scene": "LosResultados",
+    "shots": [
+      "culpa"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 5.933333333333334,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 305,
+    "frames": 110,
+    "text": "Y el 9 % incluso inventó detalles para explicar algo que jamás había ocurrido.",
+    "id": "s6-04",
+    "scene": "LosResultados",
+    "shots": [
+      "fragmentos"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 10.166666666666666,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 436,
+    "frames": 87,
+    "text": "Todo por una tecla que nunca presionaron.",
+    "id": "s6-05",
+    "scene": "LosResultados",
+    "shots": [
+      "verdad"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 14.533333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 15,
+    "frames": 148,
+    "text": "En realidad, ninguno había presionado aquella tecla. Pero algunos terminaron creyendo que sí.",
+    "id": "s7-01",
+    "scene": "ElCierre",
+    "shots": [
+      "regreso"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 0.5,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 210,
+    "frames": 153,
+    "text": "Y si alguien te asegurara que hiciste algo que no recuerdas...",
+    "id": "s7-02",
+    "scene": "ElCierre",
+    "shots": [
+      "primera-persona"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 7,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  },
+  {
+    "role": "narrador",
+    "start": 397,
+    "frames": 143,
+    "text": "Y si alguien pudiera convencerte de que hiciste algo que nunca ocurrió...",
+    "id": "s7-03",
+    "scene": "ElCierre",
+    "shots": [
+      "enlace"
+    ],
+    "gestures": [],
+    "fps": 30,
+    "startSeconds": 13.233333333333333,
+    "audioFile": null,
+    "durationSeconds": null,
+    "timestamps": []
+  }
+]

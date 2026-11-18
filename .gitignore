@@ -5,3 +5,6 @@ dist/
 .env
 .env.*
 
+/configs/voices.local.json
+/public/voices/
+/.voice-work/

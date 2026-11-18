@@ -1,4 +1,4 @@
-import {useLayoutEffect, useState} from 'react';
+import {useLayoutEffect, useState, type ReactNode} from 'react';
 import {AbsoluteFill, useVideoConfig} from 'remotion';
 
 function makeGrain() {
@@ -31,7 +31,7 @@ export function FocoGrain() {
   }} />;
 }
 
-export function FocoCaption({children, top = '66%', size = .06, inset = '6%', centerY = false}: {children: string; top?: string; size?: number; inset?: string; centerY?: boolean}) {
+export function FocoCaption({children, top = '66%', size = .06, inset = '6%', centerY = false}: {children: ReactNode; top?: string; size?: number; inset?: string; centerY?: boolean}) {
   const {width} = useVideoConfig();
   const scale = width / 420;
   return <div style={{

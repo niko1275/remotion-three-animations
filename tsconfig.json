@@ -6,6 +6,7 @@
       "ES2020"
     ],
     "module": "ESNext",
+    "types": ["node"],
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "strict": true,
@@ -14,6 +15,7 @@
     "noEmit": true
   },
   "include": [
-    "src"
+    "src",
+    "scripts/voices.ts"
   ]
 }

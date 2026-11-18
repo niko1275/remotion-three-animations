@@ -5,7 +5,9 @@ import {studentZ, typingFrame} from './timeline';
 export const upperArmLength = .284;
 export const forearmLength = .424;
 
-export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, time: number, withdrawal: number, lean: number) {
+export type HandHover = {x: number; z: number; reach: number; lift: number};
+
+export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, time: number, withdrawal: number, lean: number, hover?: HandHover) {
   const side = left ? -1 : 1;
   const wrist = new Vector3(
     side * (.134 + .026 * withdrawal),
@@ -13,8 +15,11 @@ export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, t
     keyboardZ + .232 + .065 * withdrawal - studentZ,
   );
   const {stroke, travel} = motion;
-  const reach = stroke?.left === left ? motion.reach : 0;
-  if (stroke && reach > 0) {
+  const reach = hover?.reach ?? (stroke?.left === left ? motion.reach : 0);
+  if (hover) {
+    wrist.lerp(new Vector3(hover.x + side * .026,
+      1.041 + hover.lift, hover.z + .135 - studentZ), reach);
+  } else if (stroke && reach > 0) {
     wrist.lerp(new Vector3(stroke.key.x + side * .026,
       1.041 - .010 * travel, stroke.key.z + .135 - studentZ), reach);
   }

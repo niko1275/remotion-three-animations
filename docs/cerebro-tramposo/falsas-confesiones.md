@@ -80,3 +80,17 @@ Abre **Shorts → ElFalsoTestigo** en Studio. La composición dura 15 segundos a
 | Duda | 10–15 s | La mirada baja hacia el teclado y la cámara se acerca. |
 
 Los textos están en `src/scenes/el-falso-testigo/script.ts`. En `timeline.ts` están las duraciones de los planos y los tiempos independientes de diálogo, narración y acciones, en fotogramas. `Testigo.ts` contiene la geometría procedural del nuevo personaje. Para exportar un MP4, usa `npm run render:el-falso-testigo`.
+
+## Escena 5 · El falso recuerdo
+
+Abre **Shorts → ElFalsoRecuerdo** en Studio. La composición dura 16 segundos a 1080 × 1920 y 30 fps, sin audio.
+
+| Plano | Tiempo | Acción |
+| --- | --- | --- |
+| Duda | 0–3 s | Continuación del encuadre de la escena 4. El estudiante mira hacia abajo y se pregunta si pudo haber sido él. |
+| Fragmento 1 | 3–6 s | La mano se acerca a ALT y se detiene antes de alcanzarla. |
+| Fragmento 2 | 6–9 s | El gesto vuelve a empezar desde el lado contrario, con un alcance distinto. |
+| Fragmento 3 | 9–12 s | El plano se estrecha alrededor del índice y ALT. El dedo queda por encima de la tecla. |
+| Regreso | 12–16 s | Vuelve el campo sobre el estudiante y el CRT sigue en estado de error. Las manos se recogen. |
+
+Los textos están en `src/scenes/el-falso-recuerdo/script.ts`. `timeline.ts` separa los tiempos de las voces, la duración de los planos y la trayectoria de cada fragmento. El acercamiento de la mano se calcula aparte de la señal del teclado. El MP4 se exporta con `npm run render:el-falso-recuerdo`.

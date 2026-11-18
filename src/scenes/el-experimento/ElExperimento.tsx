@@ -6,7 +6,7 @@ import {FocoCaption, FocoGrain} from '../efecto-foco/overlays';
 import {keys, keyboardDepth, keyboardWidth, keyboardZ} from './keyboard';
 import {experimentShader} from './shader';
 import {experimentFrame, typingFrame} from './timeline';
-import {armPose} from './armPose';
+import {armPose, type HandHover} from './armPose';
 
 const vertexShader = `in vec3 position;
 void main() { gl_Position = vec4(position.xy, 0., 1.); }`;
@@ -68,13 +68,14 @@ function makeDisplay(letters: string) {
 
 type LabShot = Pick<ReturnType<typeof experimentFrame>, 'camera' | 'target' | 'time' | 'withdrawal'> & {pose: readonly [number, number, number, number]};
 
-export function LabStage({shot, motion, rule, shader = fragmentShader, displayTexture, extraUniforms, children}: {
+export function LabStage({shot, motion, rule, shader = fragmentShader, displayTexture, extraUniforms, leftHover, children}: {
   shot: LabShot;
   motion: ReturnType<typeof typingFrame>;
   rule: boolean;
   shader?: string;
   displayTexture?: CanvasTexture;
   extraUniforms?: Record<string, {value: unknown}>;
+  leftHover?: HandHover;
   children?: ReactNode;
 }) {
   const {width, height} = useVideoConfig();
@@ -83,7 +84,7 @@ export function LabStage({shot, motion, rule, shader = fragmentShader, displayTe
   useEffect(() => () => legends.dispose(), [legends]);
   useEffect(() => () => display?.dispose(), [display]);
   const {stroke, travel} = motion;
-  const left = armPose(true, motion, shot.time, shot.withdrawal, shot.pose[0]);
+  const left = armPose(true, motion, shot.time, shot.withdrawal, shot.pose[0], leftHover);
   const right = armPose(false, motion, shot.time, shot.withdrawal, shot.pose[0]);
 
   const uniforms = {

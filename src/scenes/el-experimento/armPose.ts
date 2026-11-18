@@ -2,8 +2,8 @@ import {Vector3} from 'three';
 import {keyboardZ} from './keyboard';
 import {studentZ, typingFrame} from './timeline';
 
-export const upperArmLength = .275;
-export const forearmLength = .329;
+export const upperArmLength = .284;
+export const forearmLength = .424;
 
 export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, time: number, withdrawal: number, lean: number) {
   const side = left ? -1 : 1;
@@ -28,19 +28,66 @@ export function armPose(left: boolean, motion: ReturnType<typeof typingFrame>, t
   wrist.x += indexX - (cos * indexX + sin * indexZ);
   wrist.z += indexZ - (-sin * indexX + cos * indexZ);
 
-  // Rotate the shoulder about the same seated hip pivot as the torso shader.
-  const shoulder = new Vector3(side * .167,
-    .66 + Math.cos(lean) * .435 - Math.sin(lean) * .18,
-    .05 - Math.sin(lean) * .435 - Math.cos(lean) * .18);
+  // The shoulder socket sits high on the side of the shirt, above the elbow.
+  const shoulder = new Vector3(side * .152,
+    .66 + Math.cos(lean) * .479 - Math.sin(lean) * .142,
+    .05 - Math.sin(lean) * .479 - Math.cos(lean) * .142);
+
   const axis = wrist.clone().sub(shoulder);
   const distance = axis.length();
   axis.divideScalar(distance);
 
-  // The upper arm and forearm meet on a circle perpendicular to the reach.
   const along = (upperArmLength ** 2 - forearmLength ** 2 + distance ** 2) / (2 * distance);
   const bend = Math.sqrt(Math.max(0, upperArmLength ** 2 - along ** 2));
-  const pole = new Vector3(side, -.18, 0);
-  pole.addScaledVector(axis, -pole.dot(axis)).normalize();
-  const elbow = shoulder.clone().addScaledVector(axis, along).addScaledVector(pole, bend);
+  const center = shoulder.clone().addScaledVector(axis, along);
+  const elbowAt = (lift: number) => {
+    const pole = new Vector3(side * (.39 + .61 * lift), -.92 * (1 - lift), 0);
+    pole.addScaledVector(axis, -pole.dot(axis)).normalize();
+    return center.clone().addScaledVector(pole, bend);
+  };
+
+  // Keep the natural downward bend whenever its sleeve clears the desktop.
+  // Swing out gradually, without moving the wrist, when a longer reach needs room.
+  let elbow = elbowAt(0);
+  if (!clearsDesktop(shoulder, elbow, wrist)) {
+    let low = 0;
+    let high = 1;
+    for (let i = 0; i < 12; i++) {
+      const mid = (low + high) / 2;
+      if (clearsDesktop(shoulder, elbowAt(mid), wrist)) high = mid;
+      else low = mid;
+    }
+    elbow = elbowAt(high);
+  }
   return {shoulder, elbow, wrist, yaw, reach};
+}
+
+export const sleeve = {
+  shoulder: .070,
+  elbow: .046,
+  cuff: .033,
+  cuffPosition: .91,
+};
+
+// Conservatively bound the desktop by the two planes at its top and near edge.
+// A tapered segment is clear if its lower edge stays above the top wherever
+// its forward edge reaches the tabletop. Both edges are linear along the sleeve.
+function clearsDesktop(shoulder: Vector3, elbow: Vector3, wrist: Vector3) {
+  const cutoff = .92 - studentZ;
+  const surface = .958;
+  const clear = (a: Vector3, b: Vector3, ra: number, rb: number) => {
+    const frontA = a.z - ra - cutoff;
+    const frontB = b.z - rb - cutoff;
+    if (frontA > 0 && frontB > 0) return true;
+    const belowA = a.y - ra - surface;
+    const belowB = b.y - rb - surface;
+    if ((frontA <= 0 && belowA < 0) || (frontB <= 0 && belowB < 0)) return false;
+    if ((frontA > 0) === (frontB > 0)) return true;
+    const crossing = frontA / (frontA - frontB);
+    return belowA + (belowB - belowA) * crossing >= 0;
+  };
+  const cuff = elbow.clone().lerp(wrist, sleeve.cuffPosition);
+  return clear(shoulder, elbow, sleeve.shoulder, sleeve.elbow)
+    && clear(elbow, cuff, sleeve.elbow, sleeve.cuff)
+    && clear(cuff, wrist, .027, .027);
 }

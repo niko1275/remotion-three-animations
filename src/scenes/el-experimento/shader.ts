@@ -1,3 +1,4 @@
+import {sleeve} from './armPose';
 import {forms, hair, lighting} from '../efecto-foco/shaderParts';
 import {seatedBody, seatedDimensions, seatedTransforms} from '../seatedActor';
 import {alt, keyboardDepth, keyboardWidth, keys, keyboardZ, keyPitch} from './keyboard';
@@ -54,6 +55,12 @@ float fingers(vec3 p, vec3 wrist, float side, float reach) {
   return min(d,cap(p,palm+vec3(-side*.025,-.003,.007),palm+vec3(-side*.048,-.016,-.033),.013));
 }
 
+float armSegment(vec3 p, vec3 start, vec3 end, float startRadius, float endRadius) {
+  vec3 axis = end-start;
+  float t = clamp(dot(p-start,axis)/dot(axis,axis),0.,1.);
+  return length(p-start-axis*t)-mix(startRadius,endRadius,t);
+}
+
 vec2 student(vec3 p) {
   vec4 pose = STUDENT;
   float offset = 0.;
@@ -71,11 +78,9 @@ ${seatedBody}
     vec3 shoulder = i == 0 ? LEFT_SHOULDER : RIGHT_SHOULDER;
     vec3 elbow = i == 0 ? LEFT_ELBOW : RIGHT_ELBOW;
     float yaw = i == 0 ? WRIST_YAW.x : WRIST_YAW.y;
-    vec3 upper = mix(shoulder,elbow,.45);
-    vec3 forearm = mix(elbow,wrist,.46);
-    vec3 cuff = mix(elbow,wrist,.91);
-    NEAR(min(cap(p,shoulder,upper,.069),cap(p,upper,elbow,.054)),4.)
-    NEAR(min(cap(p,elbow,forearm,.046),cap(p,forearm,cuff,.037)),4.)
+    vec3 cuff = mix(elbow,wrist,${sleeve.cuffPosition});
+    NEAR(armSegment(p,shoulder,elbow,${sleeve.shoulder},${sleeve.elbow}),4.)
+    NEAR(armSegment(p,elbow,cuff,${sleeve.elbow},${sleeve.cuff}),4.)
     NEAR(cap(p,cuff,wrist,.027),9.)
     vec3 handSpace = p-wrist;
     handSpace.xz = rot(-yaw)*handSpace.xz;

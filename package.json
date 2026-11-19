@@ -18,9 +18,12 @@
     "test:animations": "node --experimental-strip-types --test tests/character-animations.test.mjs",
     "still:graphic": "remotion still src/index.ts GraphicProtagonist out/graphic-protagonist.png --frame=30 --gl=angle",
     "render:graphic": "remotion render src/index.ts GraphicProtagonist out/graphic-protagonist.mp4 --gl=angle",
-    "test:graphic": "node --test tests/graphic-asset.test.mjs"
+    "test:graphic": "node --test tests/graphic-asset.test.mjs",
+    "render:reel-voxel": "remotion render src/index.ts ReelVoxel out/reel-voxel.mp4 --gl=swangle"
   },
   "dependencies": {
+    "@fontsource/jetbrains-mono": "5.2.8",
+    "@fontsource/space-grotesk": "5.2.10",
     "@react-three/fiber": "9.8.2",
     "@remotion/cli": "4.0.544",
     "@remotion/three": "4.0.544",

@@ -1,3 +1,5 @@
+import {ReelVoxel} from './scenes/reel-voxel/ReelVoxel';
+import {FPS as reelFps, TOTAL as reelDuration} from './scenes/reel-voxel/scene';
 import {GraphicCharacterStudy} from './scenes/GraphicCharacterStudy';
 import {EfectoFoco} from './scenes/efecto-foco/EfectoFoco';
 import {Composition, Folder} from 'remotion';
@@ -12,6 +14,7 @@ export const Root = () => <>
     <Composition id="GraphicPortrait" component={GraphicCharacterStudy} durationInFrames={120} fps={30} width={1080} height={1440} defaultProps={{view:'face' as const,expression:'worried' as const}}/>
   </Folder>
   <Folder name="Shorts">
+    <Composition id="ReelVoxel" component={ReelVoxel} durationInFrames={reelDuration} fps={reelFps} width={1080} height={1920}/>
     <Composition id="EfectoFoco" component={EfectoFoco} durationInFrames={210} fps={30} width={540} height={960}/>
     <Composition id="HospitalStory" component={StoryShort} durationInFrames={450} fps={30} width={1080} height={1920} defaultProps={{lighting:'night' as const}}/>
     <Composition id="ProtagonistActions" component={CharacterShowcase} durationInFrames={720} fps={30} width={1080} height={1920}/>

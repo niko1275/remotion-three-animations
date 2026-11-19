@@ -115,3 +115,13 @@ npm run render:efecto-foco
 ```
 
 El vídeo se guarda en `out/efecto-foco.mp4`.
+
+## Reel voxel · Fotos → taxi
+
+En Remotion Studio, abre **Shorts → ReelVoxel**. Seis fotos voxel se transforman en un taxi londinense en una composición de 12 segundos a 1080 × 1920 y 30 fps.
+
+```sh
+npm run render:reel-voxel
+```
+
+El vídeo se guarda en `out/reel-voxel.mp4`.

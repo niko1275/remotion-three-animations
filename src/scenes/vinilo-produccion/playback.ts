@@ -5,7 +5,7 @@ import {
 import {buildLiving} from '../vinilo-apertura/living';
 import {palette, vector, type Position, type VinylMaterials} from '../vinilo-apertura/materials';
 import {setOpeningCamera} from '../vinilo-apertura/render';
-import {buildPlayer, TAU} from '../vinilo-apertura/vinyl';
+import {buildPlayer, DISC_Y, TAU} from '../vinilo-apertura/vinyl';
 import {VINYL_FPS, vinylTimeline} from '../../timeline';
 import {buildFigure} from './figure';
 import {contactShade} from './sets';
@@ -25,21 +25,30 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
   const {disc, tonearm, cartridge, needle} = system(room, m);
   const model = new Group();
   room.add(model);
-  // A didactic cut of the installed cartridge. The bottom supports the parts and the near shell is open.
-  m.block(model, [0.56, 0.033, 0.42], [0, -0.12, 0], '#667579', 0.011);
+  const housingY = 2.15;
+  // Leave the front and the cantilever slot open in the cutaway.
+  m.block(model, [0.56, 0.033, 0.16], [0, -0.12, -0.13], '#667579', 0.011);
   m.block(model, [0.56, 0.29, 0.038], [0, 0.012, -0.196], '#56666A', 0.015);
   m.block(model, [0.55, 0.033, 0.20], [0, 0.16, -0.096], '#57686A', 0.009);
-  for (const x of [-0.267, 0.267]) {
-    m.block(model, [0.032, 0.29, 0.42], [x, 0.014, 0], '#4A585C', 0.011);
+  for (const side of [-1, 1]) {
+    m.block(model, [0.17, 0.033, 0.15], [side * 0.195, -0.12, 0.026], '#667579', 0.011);
+    m.block(model, [0.032, 0.29, 0.27], [side * 0.267, 0.014, -0.075], '#4A585C', 0.011);
   }
-  const magnet = m.block(model, [0.108, 0.087, 0.104], [0, -0.021, 0.054], palette.copper, 0.011);
+
+  // The magnet and stylus rock together about the suspension. The coils stay fixed.
   const cantilever = new Group();
+  cantilever.position.set(0, -0.069, 0.105);
   model.add(cantilever);
-  const origin: Position = [0, -0.018, 0.054];
-  const tip: Position = [0, -0.171, 0.209];
-  m.model(cantilever, new TubeGeometry(new CatmullRomCurve3([vector(origin), vector([0, -0.106, 0.15]), vector(tip)]),
-    18, 0.014, 8, false), palette.nickel, [0, 0, 0]);
-  m.model(cantilever, new CylinderGeometry(0.023, 0.004, 0.046, 6), '#E9CA96', [0, -0.179, 0.211]);
+  const magnet: Position = [0, 0.048, -0.051];
+  const stylusBottom = DISC_Y - housingY - cantilever.position.y - 0.002;
+  const stylusZ = 0.211 - cantilever.position.z;
+  m.block(cantilever, [0.108, 0.087, 0.104], magnet, '#76878B', 0.011);
+  const shaft = new CatmullRomCurve3([
+    vector(magnet), new Vector3(), new Vector3(0, stylusBottom + 0.022, stylusZ),
+  ]);
+  m.model(cantilever, new TubeGeometry(shaft, 18, 0.014, 8, false), palette.nickel, [0, 0, 0]);
+  m.model(cantilever, new CylinderGeometry(0.018, 0.0035, 0.029, 6), '#E9CA96',
+    [0, stylusBottom + 0.0145, stylusZ]);
 
   for (const x of [-0.129, 0.129]) {
     const winding = new Group();
@@ -68,11 +77,9 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
     cartridge.visible = !reveal;
     needle.visible = !reveal;
     model.visible = reveal;
-    model.position.set(1.035, 2.15, 0.52);
+    model.position.set(1.035, housingY, 0.52);
     model.rotation.y = -0.30;
-    const vibration = 0.017 * Math.sin(t * 37) + 0.007 * Math.sin(t * 71);
-    magnet.position.x = vibration;
-    cantilever.rotation.y = vibration * 4;
+    cantilever.rotation.y = 0.14 * Math.sin(t * 37) + 0.055 * Math.sin(t * 71);
     signal.visible = p > 0.73;
     line.getPointAt(ease(0.73, 0.98, p), signal.position);
     if (!reveal) {
@@ -80,7 +87,7 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
       return {focus, exposure: 1.25, atmosphere: {beam: false, dust: false}};
     }
     const progress = ease(0.72, 0.98, p);
-    const focus = pose(camera, [1.62, 2.65, 2.62], [3.56, 3.07, 3.87], [1.03, 2.13, 0.53], progress);
+    const focus = pose(camera, [1.43, 2.56, 2.77], [3.56, 3.07, 3.87], [1.03, 2.12, 0.57], progress);
     focus.lerp(new Vector3(1.87, 1.88, -0.70), progress);
     return {focus, exposure: 1.15, atmosphere: {beam: false, dust: false}};
   };
@@ -122,12 +129,14 @@ export function buildAmplification(room: Group, m: VinylMaterials): Motion {
 
 export function buildClosing(room: Group, m: VinylMaterials): Motion {
   const {disc, cones} = system(room, m);
-  const {person, head} = buildFigure(room, m, [-2.02, 0.133, 1.32]);
-  person.rotation.y = 0.42;
-  contactShade(room, m, 1.17, 0.99, [-2.02, 0.145, 1.32]);
+  const listenerPosition: Position = [-3.37, 0.133, 2.50];
+  const {person, head} = buildFigure(room, m, listenerPosition);
+  person.rotation.y = 0.57;
+  contactShade(room, m, 1.17, 0.99, [listenerPosition[0], 0.145, listenerPosition[2]]);
   const coneOrigins = cones.map((cone) => cone.position.z);
   const openingFrames = vinylTimeline.scenes[0].durationInFrames;
-  const endFocus = new Vector3();
+  const listeningEye = new Vector3(12, 9.7, 28.75);
+  const listeningFocus = new Vector3(-0.80, 2.4, 0.55);
 
   return (camera, p, t, frame, durationInFrames) => {
     const remaining = durationInFrames - 1 - frame;
@@ -140,17 +149,12 @@ export function buildClosing(room: Group, m: VinylMaterials): Motion {
     head.rotation.z = 0.105 + Math.sin(t * 2.3) * 0.022;
     head.rotation.x = 0.065;
     person.visible = p < 0.76;
-    if (p < 0.42) {
-      const movement = ease(0.02, 0.42, p);
-      const overview = setOpeningCamera(camera, openingFrames - 1, openingFrames, VINYL_FPS, spin);
-      camera.position.lerpVectors(new Vector3(-4.5, 4.7, 14.5), camera.position, movement);
-      endFocus.set(-0.65, 1.71, 0.10).lerp(overview.focus, movement);
-      return {focus: endFocus};
-    }
     const rewind = 1 - ease(0.42, 1, p);
     const opening = setOpeningCamera(camera, rewind * (openingFrames - 1), openingFrames, VINYL_FPS, spin);
+    const onListener = 1 - ease(0.35, 0.64, p);
+    camera.position.lerp(listeningEye, onListener);
     return {
-      focus: opening.focus,
+      focus: opening.focus.lerp(listeningFocus, onListener),
       exposure: opening.exposure,
       atmosphere: {beam: opening.p > 0.45, dust: opening.p > 0.36},
     };

@@ -115,6 +115,7 @@ export function buildLiving(scene: Group, materials: VinylMaterials) {
     '#D2AD85', [2.87, 3.958, wallDepth + 0.585]);
   sleeveArt.rotation.x = Math.PI / 2;
 
+  const cones: Mesh[] = [];
   function speaker(x: number) {
     const speaker = new Group();
     speaker.position.set(x, 0.18, -0.17);
@@ -134,13 +135,16 @@ export function buildLiving(scene: Group, materials: VinylMaterials) {
       ];
       const cone = model(speaker, new LatheGeometry(coneProfile, 40), '#51575A', [0, y, 0.594]);
       cone.rotation.x = Math.PI / 2;
+      cones.push(cone);
     }
   }
   speaker(-3.16);
   speaker(3.16);
 
+  const signalCables: CatmullRomCurve3[] = [];
   function cable(points: Position[]) {
     const curve = new CatmullRomCurve3(points.map(vector));
+    signalCables.push(curve);
     model(scene, new TubeGeometry(curve, 64, 0.020, 8, false), '#292A28', [0, 0, 0]);
   }
   cable([[2.03, 1.52, -1.91], [2.44, 1.36, -1.9], [2.49, 0.84, -1.77], [2.40, 0.59, -1.68], [0.63, 0.58, 0.54]]);
@@ -183,4 +187,5 @@ export function buildLiving(scene: Group, materials: VinylMaterials) {
     leaf.rotation.set(0.31, angle, i % 2 ? 0.58 : -0.41);
   }
 
+  return {cones, signalCables};
 }

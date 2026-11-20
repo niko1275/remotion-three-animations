@@ -20,12 +20,12 @@ import {
 import {createVoxelPreview} from '../animatic/voxelPreview';
 import './vinilo-animatico.css';
 
-type Props = {
+export type VinylAudioProps = {
   voiceFiles: VoiceFiles;
   voiceDurations: VoiceDurations;
 };
 
-export const animaticDefaultProps: Props = {voiceFiles: {}, voiceDurations: {}};
+export const animaticDefaultProps: VinylAudioProps = {voiceFiles: {}, voiceDurations: {}};
 
 export function readVoiceDuration(src: string, signal: AbortSignal): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ export function readVoiceDuration(src: string, signal: AbortSignal): Promise<num
   });
 }
 
-export const calculateVinylMetadata: CalculateMetadataFunction<Props> = async ({props, abortSignal}) => {
+export const calculateVinylMetadata: CalculateMetadataFunction<VinylAudioProps> = async ({props, abortSignal}) => {
   const measured = await Promise.all(vinylScenes.map(async ({id}) => {
     const file = props.voiceFiles[id];
     return [id, file ? await readVoiceDuration(staticFile(file), abortSignal) : undefined] as const;
@@ -78,7 +78,7 @@ function cueText(cues: readonly {atFrame: number; text: string}[], frame: number
   return cues.reduce<string | undefined>((active, cue) => cue.atFrame <= frame ? cue.text : active, undefined);
 }
 
-export function ViniloAnimatico({voiceFiles, voiceDurations}: Props) {
+export function ViniloAnimatico({voiceFiles, voiceDurations}: VinylAudioProps) {
   const frame = useCurrentFrame();
   const {scenes} = buildVinylTimeline(voiceDurations);
   const index = scenes.findIndex((scene) => frame < scene.end);

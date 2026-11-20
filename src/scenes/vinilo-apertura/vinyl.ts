@@ -123,17 +123,21 @@ export function buildPlayer(parent: Group, {model, block}: VinylMaterials) {
   const arm = [
     [1.65, 2.16, -1.96], armStart, [1.68, 2.15, -0.82], [1.26, 2.13, -0.02], armEnd,
   ] as Position[];
-  model(parent, new TubeGeometry(new CatmullRomCurve3(arm.map(vector)), 52, 0.045, 10, false), palette.nickel, [0, 0, 0], true);
-  const counterweight = model(parent, new CylinderGeometry(0.125, 0.125, 0.23, 18), '#495251', [1.69, 2.16, -1.91], true);
+  const tonearm = new Group();
+  tonearm.position.set(...armStart);
+  parent.add(tonearm);
+  const local = (p: Position): Position => [p[0] - armStart[0], p[1] - armStart[1], p[2] - armStart[2]];
+  model(tonearm, new TubeGeometry(new CatmullRomCurve3(arm.map((p) => vector(local(p)))), 52, 0.045, 10, false), palette.nickel, [0, 0, 0], true);
+  const counterweight = model(tonearm, new CylinderGeometry(0.125, 0.125, 0.23, 18), '#495251', local([1.69, 2.16, -1.91]), true);
   counterweight.rotation.x = Math.PI / 2;
-  const cartridge = block(parent, [0.21, 0.14, 0.32], armEnd, '#383D41', 0.027);
+  const cartridge = block(tonearm, [0.21, 0.14, 0.32], local(armEnd), '#383D41', 0.027);
   cartridge.rotation.y = -0.36;
-  const needle = model(parent, new CylinderGeometry(0.011, 0.002, 0.045, 6), '#DFC9A1', [1.0, 2.008, 0.594]);
+  const needle = model(tonearm, new CylinderGeometry(0.011, 0.002, 0.045, 6), '#DFC9A1', local([1.0, 2.008, 0.594]));
   needle.rotation.x = -0.33;
   model(parent, new CylinderGeometry(0.125, 0.125, 0.036, 20), '#929891', [-1.84, 1.869, 1.06]);
   block(parent, [0.096, 0.011, 0.038], [-1.63, 1.866, 1.076], palette.warm, 0.004, false);
 
-  return disc;
+  return {disc, tonearm, cartridge, needle};
 }
 
 export function groovePoint(turn: number, phase: number, out: Vector3) {

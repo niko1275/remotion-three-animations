@@ -7,9 +7,13 @@ import {createVinylOpening} from './render';
 export const openingDurationInFrames = vinylTimeline.scenes[0].durationInFrames;
 const openingTitles = [...vinylTimeline.scenes[0].screenText].reverse();
 
-export function ViniloEscena1() {
+export function ViniloEscena1({duration, screenText}: {
+  duration?: number;
+  screenText?: readonly {atFrame: number; text: string}[];
+}) {
   const frame = useCurrentFrame();
   const {width, height, fps, durationInFrames} = useVideoConfig();
+  const sceneDuration = duration ?? durationInFrames;
   const canvas = useRef<HTMLCanvasElement>(null);
   const opening = useRef<ReturnType<typeof createVinylOpening> | null>(null);
 
@@ -24,10 +28,12 @@ export function ViniloEscena1() {
   }, [width, height]);
 
   useLayoutEffect(() => {
-    opening.current?.draw(frame, durationInFrames, fps);
-  }, [frame, durationInFrames, fps, width, height]);
+    opening.current?.draw(frame, sceneDuration, fps);
+  }, [frame, sceneDuration, fps, width, height]);
 
-  const title = openingTitles.find(({atFrame}) => frame >= atFrame);
+  const title = screenText
+    ? screenText.reduce<(typeof screenText)[number] | undefined>((active, cue) => cue.atFrame <= frame ? cue : active, undefined)
+    : openingTitles.find(({atFrame}) => frame >= atFrame);
   const titleOpacity = title && title.atFrame > 0 ? Math.min(1, (frame - title.atFrame) / 12) : 1;
   return (
     <AbsoluteFill style={{backgroundColor: '#929D8B'}}>

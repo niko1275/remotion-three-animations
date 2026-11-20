@@ -58,7 +58,7 @@ export const vinylScenes = [
     animation: [
       {atFrame: 0, text: 'Mostrar el cabezal y el disco de laca girando.'},
       {atFrame: 95, text: 'La punta vibra y avanza despacio hacia el centro.'},
-      {atFrame: 164, text: 'La onda de cubos se enrolla en el surco recién tallado.'},
+      {atFrame: 164, text: 'La señal modula el surco continuo que talla la punta.'},
       {atFrame: 257, text: 'La viruta continua entra por el tubo de aspiración.'},
     ],
     transition: 'Corte desde la onda enrollada a un tramo ampliado del surco.',
@@ -75,8 +75,9 @@ export const vinylScenes = [
     voiceLead: 6,
     voiceTail: 12,
     screenText: [
-      {atFrame: 185, text: 'Izquierda'},
-      {atFrame: 269, text: 'Derecha'},
+      {atFrame: 10, text: 'Graves · Agudos'},
+      {atFrame: 145, text: ''},
+      {atFrame: 194, text: 'IZQ · DER'},
     ],
     visual: 'Grave y agudo a la misma escala y velocidad. Corte en V con la pared interior y la exterior identificadas.',
     camera: 'Frontal al tramo comparado. Giro hacia el corte transversal.',
@@ -141,7 +142,7 @@ export const vinylScenes = [
     narration: 'El surco hace vibrar la aguja. La aguja mueve un imán junto a unas bobinas. Así nace una señal eléctrica.',
     voiceLead: 9,
     voiceTail: 9,
-    screenText: [{atFrame: 222, text: 'Una señal eléctrica'}],
+    screenText: [{atFrame: 148, text: 'Imán y bobinas'}, {atFrame: 222, text: 'Una señal eléctrica'}],
     visual: 'Caja de madera con bocina dorada, brazo de la aguja y cápsula de imán móvil. Una luz simboliza la señal en el cable.',
     camera: 'Viaje a ras de surco. Acercamiento a un corte de la cápsula y seguimiento del cable.',
     animation: [
@@ -169,7 +170,7 @@ export const vinylScenes = [
     animation: [
       {atFrame: 0, text: 'Mostrar el ajuste de grabación, menos graves y más agudos.'},
       {atFrame: 146, text: 'Invertir los ajustes al pasar por la entrada de fono.'},
-      {atFrame: 266, text: 'Mover el cono y reconstruir la onda de cubos que sale al aire.'},
+      {atFrame: 266, text: 'Mover el cono y volver a transmitir la vibración al aire.'},
     ],
     transition: 'La onda de salida enlaza con el relieve del disco.',
     sound: [
@@ -185,7 +186,7 @@ export const vinylScenes = [
     voiceLead: 6,
     voiceTail: 30,
     screenText: [],
-    visual: 'La onda de cubos sale de la bocina. Regresamos al tramo del surco de la apertura.',
+    visual: 'El oyente inclina la cabeza. Los conos de los dos parlantes vibran. Regresamos al surco de la apertura.',
     camera: 'Entrar al macro cenital y recuperar posición y sentido de avance iniciales.',
     animation: [
       {atFrame: 0, text: 'Volver al disco desde el parlante.'},

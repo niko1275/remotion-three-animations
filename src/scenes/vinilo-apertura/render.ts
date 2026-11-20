@@ -10,7 +10,7 @@ import {buildPlayer, DISC_Y, DISC_Z, groovePoint, TAU} from './vinyl';
 
 const eased = (start: number, end: number, progress: number) => MathUtils.smoothstep(progress, start, end);
 
-export function createVinylOpening(canvas: HTMLCanvasElement, width: number, height: number) {
+export function createVinylStage(canvas: HTMLCanvasElement, width: number, height: number) {
   const renderer = new WebGLRenderer({canvas, antialias: true, alpha: false});
   renderer.setSize(width, height, false);
   renderer.outputColorSpace = SRGBColorSpace;
@@ -21,8 +21,6 @@ export function createVinylOpening(canvas: HTMLCanvasElement, width: number, hei
   scene.background = new Color('#929D8B');
   const room = new Group();
   scene.add(room);
-  buildLiving(room, materials);
-  const disc = buildPlayer(room, materials);
 
   const key = new DirectionalLight(palette.warm, 2.15);
   key.position.set(-4.5, 6.5, -2.5);
@@ -154,17 +152,9 @@ export function createVinylOpening(canvas: HTMLCanvasElement, width: number, hei
   quad.frustumCulled = false;
   post.add(quad);
 
-  const cross = new Vector3();
-  const center = new Vector3(0, DISC_Y, DISC_Z);
-  const roomFocus = new Vector3(0.09, 2.69, -0.52);
-  const focus = new Vector3();
-  const behind = new Vector3();
-
-  function draw(frame: number, durationInFrames: number, fps: number) {
-    const t = frame / fps;
-    const p = frame / Math.max(1, durationInFrames - 1);
-    const spin = frame * TAU / 54;
-    disc.rotation.y = -spin;
+  function render(t: number, focus: Vector3, exposure = 1, atmosphere = {beam: true, dust: true}, movingShadows = false) {
+    beam.visible = atmosphere.beam;
+    dust.visible = atmosphere.dust;
     drift.forEach(({progress, spread, lift, offset}, i) => {
       const u = progress + Math.sin(t * 0.38 + offset) * 0.057;
       dustPositions.setXYZ(i,
@@ -173,26 +163,12 @@ export function createVinylOpening(canvas: HTMLCanvasElement, width: number, hei
         MathUtils.lerp(-1.78, 0.95, u) + spread * 1.45);
     });
     dustPositions.needsUpdate = true;
-    const reveal = eased(0.09, 0.63, p);
-    const wider = eased(0.46, 0.96, p);
-    beam.visible = p > 0.45;
-    dust.visible = p > 0.36;
-    const angle = 2.19 + 0.018 * Math.sin(t * 1.39);
-    groovePoint(14 + (angle - spin) / TAU, angle, cross);
-    cross.y -= 0.0044;
-    focus.copy(cross).lerp(center, reveal).lerp(roomFocus, wider);
-    const yaw = MathUtils.lerp(0.94, 0.40, eased(0.10, 0.79, p));
-    const elevation = MathUtils.lerp(0.315, 0.68, eased(0.07, 0.51, p)) - 0.31 * wider;
-    const distance = 0.075 + 6.5 * reveal * reveal + 22.5 * wider;
-    behind.set(Math.sin(yaw) * Math.cos(elevation), Math.sin(elevation), Math.cos(yaw) * Math.cos(elevation));
-    camera.position.copy(focus).addScaledVector(behind, distance);
-    camera.near = MathUtils.lerp(0.001, 0.065, wider);
     camera.updateProjectionMatrix();
     camera.lookAt(focus);
-    postMaterial.uniforms.focusDistance.value = distance;
+    postMaterial.uniforms.focusDistance.value = camera.position.distanceTo(focus);
     postMaterial.uniforms.cameraNear.value = camera.near;
-    postMaterial.uniforms.exposure.value = 1 + 0.72 * (1 - eased(0.09, 0.52, p));
-
+    postMaterial.uniforms.exposure.value = exposure;
+    if (movingShadows) key.shadow.needsUpdate = true;
     renderer.setRenderTarget(target);
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
@@ -219,5 +195,36 @@ export function createVinylOpening(canvas: HTMLCanvasElement, width: number, hei
     renderer.dispose();
   }
 
-  return {draw, dispose};
+  return {room, materials, camera, render, dispose};
+}
+
+export function setOpeningCamera(camera: PerspectiveCamera, frame: number, durationInFrames: number, fps: number, overrideSpin?: number) {
+  const p = frame / Math.max(1, durationInFrames - 1);
+  const t = frame / fps;
+  const spin = overrideSpin ?? frame * TAU / 54;
+  const reveal = eased(0.09, 0.63, p);
+  const wider = eased(0.46, 0.96, p);
+  const angle = 2.19 + 0.018 * Math.sin(t * 1.39);
+  const focus = groovePoint(14 + (angle - spin) / TAU, angle, new Vector3());
+  focus.y -= 0.0044;
+  focus.lerp(new Vector3(0, DISC_Y, DISC_Z), reveal).lerp(new Vector3(0.09, 2.69, -0.52), wider);
+  const yaw = MathUtils.lerp(0.94, 0.40, eased(0.10, 0.79, p));
+  const elevation = MathUtils.lerp(0.315, 0.68, eased(0.07, 0.51, p)) - 0.31 * wider;
+  const distance = 0.075 + 6.5 * reveal * reveal + 22.5 * wider;
+  const behind = new Vector3(Math.sin(yaw) * Math.cos(elevation), Math.sin(elevation), Math.cos(yaw) * Math.cos(elevation));
+  camera.position.copy(focus).addScaledVector(behind, distance);
+  camera.near = MathUtils.lerp(0.001, 0.065, wider);
+  return {focus, spin, p, exposure: 1 + 0.72 * (1 - eased(0.09, 0.52, p))};
+}
+
+export function createVinylOpening(canvas: HTMLCanvasElement, width: number, height: number) {
+  const stage = createVinylStage(canvas, width, height);
+  buildLiving(stage.room, stage.materials);
+  const {disc} = buildPlayer(stage.room, stage.materials);
+  function draw(frame: number, durationInFrames: number, fps: number) {
+    const {focus, spin, p, exposure} = setOpeningCamera(stage.camera, frame, durationInFrames, fps);
+    disc.rotation.y = -spin;
+    stage.render(frame / fps, focus, exposure, {beam: p > 0.45, dust: p > 0.36});
+  }
+  return {draw, dispose: stage.dispose};
 }

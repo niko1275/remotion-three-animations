@@ -3,9 +3,11 @@
 ## Estado
 
 - Etapa 1 aprobada. Guion de 76 segundos y tratamiento voxel basados en la referencia aprobada y el brief.
-- Etapa 2 implementada para revisión. **Shorts → ViniloAnimatico** muestra ocho fichas provisionales con guion, cámara, acción, sonido, rótulos y cortes. La revisión añade una maqueta animada provisional basada en la caja de madera y bocina dorada de la imagen de referencia. El disco gira y la aguja baja. Los cambios de cámara y las transiciones se prueban a lo largo de las ocho fichas. La caja es una estilización de un tocadiscos eléctrico, como el del guion.
+- Etapa 2 implementada para revisión. **Shorts → ViniloAnimatico** muestra ocho fichas provisionales con guion, cámara, acción, sonido, rótulos y cortes. La versión revisada por el usuario todavía muestra el modelo acústico en algunas fichas. Su reemplazo por un tocadiscos eléctrico es la primera corrección de producción.
 - Fuente de verdad: `src/timeline.ts`. Los inicios son acumulados. El total estimado es de 2280 fotogramas a 30 fps, en 1080 × 1920. Si se indica un audio en `voiceFiles`, Remotion mide su duración y desplaza las escenas siguientes. El ajuste conserva las pausas de entrada y salida de cada escena.
-- A la espera de aprobación de la etapa 2 para producir los textos exactos de ElevenLabs en `public/audio/voz/escenaNN.txt`. La etapa 4 empieza con la apertura macro y continúa una escena por vez, tras aprobación. Verificar `docs/ESTILO.md` y la ubicación de `Pieza`, `Muneco`, `Escenario`, `Textos` y `Papel` antes de construir escenas.
+- El usuario pidió trabajar las ocho escenas sin locución y añadir la voz con ElevenLabs después. La aprobación de la guía habilita únicamente la escena 1. Las demás quedan fuera de esta revisión.
+- Guía `docs/ESTILO.md` aprobada. **Shorts → ViniloEscena1** presenta la apertura independiente, con surco continuo en V, tocadiscos eléctrico, amplificador y dos parlantes en el living. La cámara se aleja en un plano continuo. La revisión es silenciosa.
+- Capturas de la apertura revisadas en los fotogramas 0, 135 y 269, a 1080 × 1920. Pendiente la aprobación de la escena 1 antes de construir la escena 2.
 
 ## Rigor
 
@@ -18,6 +20,7 @@
 | Laca plateada, baño de níquel y copias padre negativo, madre positiva y molde negativo. | Sí, para galvanoplastia de tres pasos. | [MPO](https://mpo-international.com/en/blog/vinyl-pressing-the-secrets-behind-mpos-craftsmanship/), [Electromastering Lab](https://recordplating.com/our-processes/) |
 | Dos moldes prensan PVC caliente. La prensa enfría el disco antes de abrir. | Sí. | [The VinyLab](https://www.thevinylab.com/our-process) |
 | En una cápsula de imán móvil, la aguja mueve el imán junto a bobinas fijas. El parlante convierte la señal amplificada en sonido. | Sí. | [Ortofon, cápsula de imán móvil](https://ortofon.com/pages/what-is-moving-magnet/), [Ortofon, electromagnetismo](https://ortofon.com/pages/discovery-of-electromagnetism) |
+| El equipo del corto es un tocadiscos eléctrico. La señal de la cápsula llega por cable a la etapa de fono y al amplificador, que alimenta dos parlantes. El gramófono de bocina representa reproducción acústica, asociada históricamente a discos de goma laca. | Sí. Mostrar plato, brazo con contrapeso, cápsula y aguja. La onda del final sale de los conos de los parlantes. | [Ortofon, electromagnetismo](https://ortofon.com/pages/discovery-of-electromagnetism), [Smithsonian, reproducción mecánica](https://americanhistory.si.edu/explore/exhibitions/americas-listening/online/edisons-talking-machine), [Library of Congress, soportes y velocidades](https://loc.gov/marc/bibliographic/bd007s.html) |
 | La curva RIAA atenúa graves y realza agudos al grabar. El preamplificador aplica el ajuste inverso. | Sí. | [Audio-Technica](https://docs.audio-technica.com/eu/Cartridges_Glossary_EN.pdf) |
 | El LP de fondo gira a 33⅓ rpm. A 30 fps, son 54 fotogramas por vuelta. | Sí. La equivalencia es un cálculo. | [IASA](https://iasa-web.org/book/export/html/474) |
 

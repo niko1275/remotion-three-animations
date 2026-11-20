@@ -19,7 +19,8 @@
     "still:graphic": "remotion still src/index.ts GraphicProtagonist out/graphic-protagonist.png --frame=30 --gl=angle",
     "render:graphic": "remotion render src/index.ts GraphicProtagonist out/graphic-protagonist.mp4 --gl=angle",
     "test:graphic": "node --test tests/graphic-asset.test.mjs",
-    "render:reel-voxel": "remotion render src/index.ts ReelVoxel out/reel-voxel.mp4 --gl=swangle"
+    "render:reel-voxel": "remotion render src/index.ts ReelVoxel out/reel-voxel.mp4 --gl=swangle",
+    "render:vinilo-animatico": "remotion render src/index.ts ViniloAnimatico out/vinilo-animatico.mp4"
   },
   "dependencies": {
     "@fontsource/jetbrains-mono": "5.2.8",

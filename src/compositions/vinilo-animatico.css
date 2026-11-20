@@ -30,50 +30,41 @@
 
 .vinilo-animatico h1 {
   margin: 2cqw 0 1.8cqw;
-  font-size: 8.4cqw;
+  font-size: 6.9cqw;
   line-height: 1;
   letter-spacing: -.055em;
   text-wrap: balance;
 }
 
-.vinilo-animatico-visual {
-  margin: 0;
-  max-width: 80cqw;
-  font-size: 4.4cqw;
-  line-height: 1.2;
+.vinilo-animatico-preview {
+  position: absolute;
+  inset: 19% 7% auto;
+  display: block;
+  width: 86%;
+  height: auto;
+  border: .15cqw solid var(--ink);
 }
 
-.vinilo-animatico-plan dl {
+.vinilo-animatico-note {
+  position: absolute;
+  inset: 71% 7% auto;
   display: grid;
-  gap: 2.4cqw;
-  margin: 4.8cqw 0 0;
-  padding: 3.2cqw 3.6cqw;
-  background: var(--slate);
-  color: #fff;
-}
-
-.vinilo-animatico-plan dl div {
-  display: grid;
-  grid-template-columns: 14cqw 1fr;
+  grid-template-columns: 13cqw 1fr;
   align-items: baseline;
   gap: 2.4cqw;
+  color: var(--ink);
+  font-size: 3.4cqw;
+  line-height: 1.17;
 }
 
-.vinilo-animatico-plan dt {
-  color: var(--cream);
+.vinilo-animatico-note span {
   font: 500 2.55cqw "JetBrains Mono", monospace;
   text-transform: uppercase;
 }
 
-.vinilo-animatico-plan dd {
-  margin: 0;
-  font-size: 3.55cqw;
-  line-height: 1.25;
-}
-
 .vinilo-animatico-overlay {
   position: absolute;
-  inset: 68% 7% auto;
+  inset: 65% 7% auto;
   text-align: center;
   color: #fff;
   paint-order: stroke fill;
@@ -84,7 +75,7 @@
 
 .vinilo-animatico-voice {
   position: absolute;
-  inset: 76% 7% auto;
+  inset: 79% 7% auto;
   padding-top: 2.5cqw;
   border-top: .15cqw solid currentColor;
 }
@@ -96,6 +87,6 @@
 
 .vinilo-animatico-voice p {
   margin: 1.3cqw 0 0;
-  font-size: 4.25cqw;
+  font-size: 4.05cqw;
   line-height: 1.19;
 }

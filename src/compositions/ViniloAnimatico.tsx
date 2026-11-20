@@ -1,3 +1,4 @@
+import {useLayoutEffect, useRef} from 'react';
 import {
   AbsoluteFill,
   Html5Audio,
@@ -16,6 +17,7 @@ import {
   type VoiceDurations,
   type VoiceFiles,
 } from '../timeline';
+import {createVoxelPreview} from '../animatic/voxelPreview';
 import './vinilo-animatico.css';
 
 type Props = {
@@ -84,8 +86,21 @@ export function ViniloAnimatico({voiceFiles, voiceDurations}: Props) {
   const localFrame = frame - scene.from;
   const screenText = cueText(scene.screenText, localFrame);
   const action = cueText(scene.animation, localFrame);
-  const sound = cueText(scene.sound, localFrame);
   const voiceFile = voiceFiles[scene.id];
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const preview = useRef<ReturnType<typeof createVoxelPreview> | null>(null);
+  const sceneId = scene.id;
+  const progress = localFrame / Math.max(1, scene.durationInFrames - 1);
+  const cut = localFrame >= scene.durationInFrames - VINYL_FPS;
+
+  useLayoutEffect(() => {
+    if (canvas.current) preview.current = createVoxelPreview(canvas.current);
+    return () => {preview.current = null;};
+  }, []);
+
+  useLayoutEffect(() => {
+    preview.current?.draw(sceneId, progress, localFrame / VINYL_FPS);
+  }, [sceneId, progress, localFrame]);
 
   return (
     <AbsoluteFill className="vinilo-animatico">
@@ -96,16 +111,20 @@ export function ViniloAnimatico({voiceFiles, voiceDurations}: Props) {
       <section className="vinilo-animatico-plan">
         <div className="vinilo-animatico-time">{timecode(scene.from)}–{timecode(scene.end)}</div>
         <h1>{scene.title}</h1>
-        <p className="vinilo-animatico-visual">{scene.visual}</p>
-        <dl>
-          <div><dt>Cámara</dt><dd>{scene.camera}</dd></div>
-          {localFrame >= scene.durationInFrames - 30
-            ? <div><dt>Corte</dt><dd>{scene.transition}</dd></div>
-            : <div><dt>Acción</dt><dd>{action}</dd></div>}
-          {sound && <div><dt>Sonido</dt><dd>{sound}</dd></div>}
-        </dl>
       </section>
+      <canvas
+        ref={canvas}
+        className="vinilo-animatico-preview"
+        width={864}
+        height={814}
+        role="img"
+        aria-label={scene.visual}
+      />
       <div className="vinilo-animatico-overlay">{screenText}</div>
+      <div className="vinilo-animatico-note">
+        <span>{cut ? 'Corte' : 'Acción'}</span>
+        {cut ? scene.transition : action}
+      </div>
       <section className="vinilo-animatico-voice">
         <div>Narración</div>
         <p>{scene.narration}</p>

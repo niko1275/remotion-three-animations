@@ -28,7 +28,7 @@ export const vinylScenes = [
     voiceLead: 12,
     voiceTail: 22,
     screenText: [{atFrame: 150, text: 'Una sola espiral'}],
-    visual: 'Un cañón de bloques de vinilo negro. Al alejarse la cámara, el cañón resulta ser un tramo de la espiral del disco.',
+    visual: 'Un cañón de bloques de vinilo negro. Al alejarse la cámara, el cañón resulta ser la espiral de un LP en un tocadiscos de caja de madera y bocina dorada.',
     camera: 'Cenital en macro extremo. Retroceso en perspectiva y giro corto para revelar el LP.',
     animation: [
       {atFrame: 0, text: 'Recorrer un tramo del surco entre las dos paredes.'},
@@ -138,7 +138,7 @@ export const vinylScenes = [
     voiceLead: 9,
     voiceTail: 9,
     screenText: [{atFrame: 222, text: 'Una señal eléctrica'}],
-    visual: 'Aguja, brazo de la aguja, imán móvil, bobinas fijas y cable. Una luz simboliza la señal.',
+    visual: 'Caja de madera con bocina dorada, brazo de la aguja y cápsula de imán móvil. Una luz simboliza la señal en el cable.',
     camera: 'Viaje a ras de surco. Acercamiento a un corte de la cápsula y seguimiento del cable.',
     animation: [
       {atFrame: 0, text: 'Bajar la aguja hasta el surco.'},
@@ -181,7 +181,7 @@ export const vinylScenes = [
     voiceLead: 6,
     voiceTail: 30,
     screenText: [],
-    visual: 'Regreso al mismo tramo del surco de la apertura.',
+    visual: 'La onda de cubos sale de la bocina. Regresamos al tramo del surco de la apertura.',
     camera: 'Entrar al macro cenital y recuperar posición y sentido de avance iniciales.',
     animation: [
       {atFrame: 0, text: 'Volver al disco desde el parlante.'},

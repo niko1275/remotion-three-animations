@@ -3,7 +3,7 @@
 ## Estado
 
 - Etapa 1 aprobada. Guion de 76 segundos y tratamiento voxel basados en la referencia aprobada y el brief.
-- Etapa 2 implementada para revisión. **Shorts → ViniloAnimatico** muestra ocho fichas provisionales con guion, cámara, acción, sonido, rótulos y cortes. La referencia de estilo en esta etapa es el brief y el reel voxel aprobados.
+- Etapa 2 implementada para revisión. **Shorts → ViniloAnimatico** muestra ocho fichas provisionales con guion, cámara, acción, sonido, rótulos y cortes. La revisión añade una maqueta animada provisional basada en la caja de madera y bocina dorada de la imagen de referencia. El disco gira y la aguja baja. Los cambios de cámara y las transiciones se prueban a lo largo de las ocho fichas. La caja es una estilización de un tocadiscos eléctrico, como el del guion.
 - Fuente de verdad: `src/timeline.ts`. Los inicios son acumulados. El total estimado es de 2280 fotogramas a 30 fps, en 1080 × 1920. Si se indica un audio en `voiceFiles`, Remotion mide su duración y desplaza las escenas siguientes. El ajuste conserva las pausas de entrada y salida de cada escena.
 - A la espera de aprobación de la etapa 2 para producir los textos exactos de ElevenLabs en `public/audio/voz/escenaNN.txt`. La etapa 4 empieza con la apertura macro y continúa una escena por vez, tras aprobación. Verificar `docs/ESTILO.md` y la ubicación de `Pieza`, `Muneco`, `Escenario`, `Textos` y `Papel` antes de construir escenas.
 

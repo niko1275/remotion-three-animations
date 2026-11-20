@@ -8,6 +8,7 @@
 - El usuario pidió trabajar las ocho escenas sin locución y añadir la voz con ElevenLabs después. La aprobación de la guía habilita únicamente la escena 1. Las demás quedan fuera de esta revisión.
 - Guía `docs/ESTILO.md` aprobada. **Shorts → ViniloEscena1** presenta la apertura independiente, con surco continuo en V, tocadiscos eléctrico, amplificador y dos parlantes en el living. La cámara se aleja en un plano continuo. La revisión es silenciosa.
 - Escena 1 aprobada por el usuario. Se revisaron las capturas de los fotogramas 0, 135 y 269 a 1080 × 1920. La composición de revisión es **Shorts → ViniloEscena1**. La escena 2 queda como siguiente tarea de producción.
+- Variante del gancho para revisar en Remotion. «Estás dentro de una canción» abre desde el primer fotograma. El rótulo se retira antes de revelar la espiral, y el texto de voz queda en el timeline para ElevenLabs.
 
 ## Rigor
 

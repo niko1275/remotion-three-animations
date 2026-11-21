@@ -2,14 +2,13 @@ import {useLayoutEffect, useRef, useState} from 'react';
 import {AbsoluteFill, interpolate, staticFile, useCurrentFrame, useDelayRender, useVideoConfig} from 'remotion';
 import {TextureLoader} from 'three';
 import '@fontsource/space-grotesk/latin-700.css';
-import {createPrintOpening} from './print';
+import {createPrintOpening, printOpeningFrames} from './print';
 
-export const printOpeningFrames = 345;
 const clamped = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 export function CuatroTintasApertura() {
   const frame = useCurrentFrame();
-  const {width, height, fps, durationInFrames} = useVideoConfig();
+  const {width, height, fps} = useVideoConfig();
   const {delayRender, continueRender, cancelRender} = useDelayRender();
   const [handle] = useState(() => delayRender('Cargando la foto para el corto de cuatro tintas'));
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -18,8 +17,8 @@ export function CuatroTintasApertura() {
 
   useLayoutEffect(() => {
     latestFrame.current = frame;
-    scene.current?.draw(frame, durationInFrames, fps);
-  }, [durationInFrames, fps, frame]);
+    scene.current?.draw(frame, fps);
+  }, [fps, frame]);
 
   useLayoutEffect(() => {
     const surface = canvas.current!;
@@ -28,7 +27,7 @@ export function CuatroTintasApertura() {
       if (disposed) return;
       try {
         scene.current = createPrintOpening(surface, width, height, loaded);
-        scene.current.draw(latestFrame.current, durationInFrames, fps);
+        scene.current.draw(latestFrame.current, fps);
         continueRender(handle);
       } catch (error) {
         cancelRender(error instanceof Error ? error : new Error(String(error)));
@@ -44,12 +43,13 @@ export function CuatroTintasApertura() {
       portrait.dispose();
       continueRender(handle);
     };
-  }, [cancelRender, continueRender, durationInFrames, fps, handle, height, width]);
+  }, [cancelRender, continueRender, fps, handle, height, width]);
 
-  const p = frame / (durationInFrames - 1);
-  const title = p < 0.31 ? 'Esta foto tiene cuatro tintas' : 'Los puntos forman la foto';
-  const opacity = p < 0.31 ? interpolate(p, [0.25, 0.31], [1, 0], clamped)
-    : interpolate(p, [0.71, 0.76], [0, 1], clamped);
+  const p = frame / (printOpeningFrames - 1);
+  const title = p < 0.34 ? '¿Cómo llegó la tinta?' : 'Dentro de la impresora';
+  const opacity = p < 0.34
+    ? interpolate(p, [0, 0.025, 0.27, 0.34], [0, 1, 1, 0], clamped)
+    : interpolate(p, [0.64, 0.71, 0.93, 0.99], [0, 1, 1, 0], clamped);
   return (
     <AbsoluteFill style={{backgroundColor: '#929D8B'}}>
       <canvas ref={canvas} style={{display: 'block', width: '100%', height: '100%'}} />

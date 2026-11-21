@@ -1,11 +1,11 @@
 import {
-  CatmullRomCurve3, CylinderGeometry, Group, Mesh, MeshBasicMaterial, SphereGeometry, TorusGeometry,
-  TubeGeometry, Vector3,
+  CatmullRomCurve3, CylinderGeometry, DoubleSide, Group, Mesh, MeshBasicMaterial, PlaneGeometry, RingGeometry,
+  SphereGeometry, TorusGeometry, TubeGeometry, Vector3,
 } from 'three';
 import {buildLiving} from '../vinilo-apertura/living';
 import {palette, vector, type Position, type VinylMaterials} from '../vinilo-apertura/materials';
 import {setOpeningCamera} from '../vinilo-apertura/render';
-import {buildPlayer, DISC_Y, TAU} from '../vinilo-apertura/vinyl';
+import {buildPlayer, DISC_Y, DISC_Z, grooveRadius, TAU, TURN_COUNT} from '../vinilo-apertura/vinyl';
 import {VINYL_FPS, vinylTimeline} from '../../timeline';
 import {buildFigure} from './figure';
 import {contactShade} from './sets';
@@ -21,8 +21,49 @@ function signalDot(room: Group, radius: number) {
   return dot;
 }
 
+function buildGrooveTrace(room: Group) {
+  const segments = 48;
+  const geometry = new PlaneGeometry(1, 1, 1, segments);
+  const material = new MeshBasicMaterial({color: palette.warm, transparent: true, depthWrite: false, side: DoubleSide});
+  const mesh = new Mesh(geometry, material);
+  mesh.frustumCulled = false;
+  room.add(mesh);
+
+  return (tip: Vector3, spin: number, opacity: number) => {
+    mesh.visible = opacity > 0;
+    if (!mesh.visible) return;
+    const z = tip.z - DISC_Z;
+    const center = Math.atan2(z, tip.x);
+    const radius = Math.hypot(tip.x, z);
+    const revolutions = (center - spin) / TAU;
+    const fraction = revolutions - Math.floor(revolutions);
+    let closest = fraction;
+    for (let turn = 1; turn < TURN_COUNT; turn++) {
+      const candidate = turn + fraction;
+      if (Math.abs(grooveRadius(candidate) - radius) < Math.abs(grooveRadius(closest) - radius)) closest = candidate;
+    }
+
+    const vertices = geometry.getAttribute('position');
+    for (let index = 0; index <= segments; index++) {
+      const progress = index / segments;
+      const arc = (progress - 0.5) * 0.62;
+      const angle = center + arc;
+      const outer = grooveRadius(closest + arc / TAU);
+      const width = 0.0032 * Math.sin(progress * Math.PI);
+      for (const side of [0, 1]) {
+        const r = outer + (2 * side - 1) * width;
+        vertices.setXYZ(index * 2 + side, r * Math.cos(angle), DISC_Y + 0.0015, DISC_Z + r * Math.sin(angle));
+      }
+    }
+    vertices.needsUpdate = true;
+    material.opacity = opacity;
+  };
+}
+
 export function buildPickup(room: Group, m: VinylMaterials): Motion {
   const {disc, tonearm, cartridge, needle} = system(room, m);
+  const traceGroove = buildGrooveTrace(room);
+  const needleTip = new Vector3();
   const model = new Group();
   room.add(model);
   const housingY = 2.15;
@@ -71,7 +112,8 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
   return (camera, p, t) => {
     const reveal = p >= 0.49;
     const lower = ease(0.02, 0.22, p);
-    disc.rotation.y = -t * TAU / 1.8;
+    const spin = t * TAU / 1.8;
+    disc.rotation.y = -spin;
     tonearm.rotation.x = mix(-0.068, 0.0025, lower) + 0.00043 * Math.sin(t * 62);
     tonearm.rotation.y = -0.018 * ease(0.20, 0.95, p);
     cartridge.visible = !reveal;
@@ -82,8 +124,11 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
     cantilever.rotation.y = 0.14 * Math.sin(t * 37) + 0.055 * Math.sin(t * 71);
     signal.visible = p > 0.73;
     line.getPointAt(ease(0.73, 0.98, p), signal.position);
+    needle.localToWorld(needleTip.set(0, -0.0225, 0));
+    traceGroove(needleTip, spin, reveal ? 0 : 0.75 * ease(0.22, 0.28, p));
     if (!reveal) {
       const focus = pose(camera, [2.37, 2.56, 2.43], [1.78, 2.32, 1.90], [1.08, 2.10, 0.70], ease(0, 0.49, p));
+      focus.y -= 0.045 * ease(0.22, 0.47, p);
       return {focus, exposure: 1.25, atmosphere: {beam: false, dust: false}};
     }
     const progress = ease(0.72, 0.98, p);
@@ -104,6 +149,14 @@ export function buildAmplification(room: Group, m: VinylMaterials): Motion {
   const signal = signalDot(room, 0.052);
   const [input, , right] = signalCables;
   const coneOrigins = cones.map((cone) => cone.position.z);
+  const rightWoofer = cones[2];
+  const waveOrigin = room.worldToLocal(rightWoofer.getWorldPosition(new Vector3()));
+  const waveRing = new RingGeometry(0.316, 0.33, 56);
+  const airWaves = Array.from({length: 3}, () => {
+    const wave = new Mesh(waveRing, new MeshBasicMaterial({color: palette.warm, transparent: true, depthWrite: false}));
+    room.add(wave);
+    return wave;
+  });
 
   return (camera, p, t) => {
     disc.rotation.y = -t * TAU / 1.8;
@@ -119,6 +172,15 @@ export function buildAmplification(room: Group, m: VinylMaterials): Motion {
     const playback = ease(0.73, 0.91, p);
     cones.forEach((cone, index) => {
       cone.position.z = coneOrigins[index] + Math.sin(t * (index % 2 ? 17 : 22)) * 0.026 * playback;
+    });
+    // Expanding contours visualize the pressure wave leaving the right speaker.
+    airWaves.forEach((wave, index) => {
+      const travel = (t * 1.25 + index / airWaves.length) % 1;
+      wave.visible = playback > 0;
+      wave.position.copy(waveOrigin);
+      wave.position.z += 0.05 + travel * 0.55;
+      wave.scale.setScalar(0.98 + travel * 0.66);
+      wave.material.opacity = 0.53 * playback * Math.sin(Math.PI * travel);
     });
     const pan = ease(0.53, 0.99, p);
     const focus = pose(camera, [1.30, 1.77, 5.40], [6.02, 3.02, 11.18], [-0.04, 0.76, 1.22], pan);

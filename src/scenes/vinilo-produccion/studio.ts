@@ -1,5 +1,5 @@
 import {
-  CatmullRomCurve3, Color, CylinderGeometry, Group, Mesh, MeshBasicMaterial,
+  CatmullRomCurve3, Color, Curve, CylinderGeometry, Group, Mesh, MeshBasicMaterial,
   TubeGeometry, Vector3,
 } from 'three';
 import {palette, vector, type VinylMaterials} from '../vinilo-apertura/materials';
@@ -8,6 +8,32 @@ import {buildFigure} from './figure';
 import {grooveSample, leftWall, rightWall, profileEye, profileFocus, profilePosition} from './groove';
 import {bench, contactShade, workRoom} from './sets';
 import {ease, mix, pose, type Motion} from './shot';
+
+const cuttingTurns = 8;
+const cuttingSteps = 224;
+const cuttingSides = 5;
+
+function cuttingRadius(turn: number) {
+  return 1.07 - 0.103 * turn + 0.023 * Math.sin(turn * TAU * 7.5) + 0.003 * Math.sin(turn * TAU * 17);
+}
+
+class CuttingSpiral extends Curve<Vector3> {
+  constructor() {
+    super();
+  }
+
+  getPoint(progress: number, target = new Vector3()) {
+    const turn = progress * cuttingTurns;
+    const angle = -turn * TAU;
+    const r = cuttingRadius(turn);
+    return target.set(r * Math.cos(angle), 0.001, r * Math.sin(angle));
+  }
+
+  // Use equal steps in disc rotation so the growing line ends at the cutter.
+  getUtoTmapping(progress: number) {
+    return progress;
+  }
+}
 
 function studio(room: Group, m: VinylMaterials) {
   workRoom(room, m, false);
@@ -37,13 +63,7 @@ export function buildCutting(room: Group, m: VinylMaterials): Motion {
   m.model(disk, new CylinderGeometry(1.15, 1.15, 0.075, 120), '#493D39', [0, -0.0375, 0], false);
   m.model(disk, new CylinderGeometry(0.061, 0.061, 0.14, 24), palette.nickel, [0, 0.02, 0]);
 
-  const cut = Array.from({length: 337}, (_, i) => {
-    const turn = i / 56;
-    const wedge = -turn * TAU;
-    const radius = 1.07 - 0.103 * turn;
-    return new Vector3(radius * Math.cos(wedge), 0.001, radius * Math.sin(wedge));
-  });
-  const spiral = new Mesh(new TubeGeometry(new CatmullRomCurve3(cut), 336, 0.007, 5, false),
+  const spiral = new Mesh(new TubeGeometry(new CuttingSpiral(), cuttingTurns * cuttingSteps, 0.007, cuttingSides, false),
     new MeshBasicMaterial({color: '#AD7459'}));
   disk.add(spiral);
 
@@ -54,7 +74,7 @@ export function buildCutting(room: Group, m: VinylMaterials): Motion {
   m.block(cutter, [0.22, 0.16, 1.57], [0, 0.80, -0.79], '#889693', 0.028);
   m.block(cutter, [0.51, 0.56, 0.44], [0, 0.39, 0], palette.slate, 0.027);
   m.block(cutter, [0.39, 0.115, 0.26], [0, 0.287, 0.239], '#94988A', 0.016);
-  const needle = m.model(cutter, new CylinderGeometry(0.08, 0.012, 0.15, 6), '#8BA9BD', [0, 0.094, 0], true);
+  const needle = m.model(cutter, new CylinderGeometry(0.08, 0.012, 0.15, 6), '#8BA9BD', [0.007, 0.075, 0], true);
   needle.rotation.z = -0.09;
   const suction = new CatmullRomCurve3([[0.11, 0.151, 0.17], [0.34, 0.42, 0.24], [0.52, 0.58, -0.26]].map(p => vector(p as [number,number,number])));
   m.model(cutter, new TubeGeometry(suction, 28, 0.039, 10, false), '#343E42', [0, 0, 0]);
@@ -75,12 +95,10 @@ export function buildCutting(room: Group, m: VinylMaterials): Motion {
 
   const focus = new Vector3();
   return (camera, p, t) => {
-    const spin = t * TAU / 1.8;
-    disk.rotation.y = -spin;
-    // More of the groove becomes visible as the cutter moves inward.
-    const groups = Math.max(0, Math.min(336, Math.floor((spin / TAU) * 56)));
-    spiral.geometry.setDrawRange(0, groups * 5 * 6);
-    cutter.position.set(centerX + 1.07 - 0.103 * (groups / 56), 1.802, centerZ);
+    const turn = Math.min(cuttingTurns, t / 1.8);
+    disk.rotation.y = -turn * TAU;
+    spiral.geometry.setDrawRange(0, Math.floor(turn * cuttingSteps) * cuttingSides * 6);
+    cutter.position.set(centerX + cuttingRadius(turn), 1.802, centerZ);
     swarf.visible = p >= 0.15;
     swarf.rotation.x = Math.sin(t * 10) * 0.22;
     head.rotation.z = 0.09 + Math.sin(t * 1.21) * 0.026;
@@ -99,17 +117,20 @@ export function buildStereo(room: Group, m: VinylMaterials): Motion {
   const samples = new Group();
   samples.position.set(0, 1.31, -0.32);
   room.add(samples);
-  for (const [row, cycles] of [[0, 2.2], [1, 9.1]]) {
+  const guides = [leftWall, rightWall].map((color) => new Color(color));
+  const traceColors = [2.2, 9.1].map((cycles, row) => {
     const z = row ? 0.59 : -0.59;
     m.block(samples, [2.92, 0.065, 0.81], [0, 0.0, z], '#4F4A44', 0.025);
     const points = Array.from({length: 200}, (_, index) => {
       const u = index / 199;
       return new Vector3((u - 0.5) * 2.68, 0.048, z + 0.205 * Math.sin(u * TAU * cycles));
     });
-    m.model(samples, new TubeGeometry(new CatmullRomCurve3(points), 199, 0.018, 6, false),
+    const trace = m.model(samples, new TubeGeometry(new CatmullRomCurve3(points), 199, 0.018, 6, false),
       row ? rightWall : leftWall, [0, 0, 0]);
-  }
-  const guides = [leftWall, rightWall].map((color) => new Color(color));
+    trace.material = trace.material.clone();
+    return trace.material.color;
+  });
+  const inactiveTrace = new Color('#757870');
   const neutral = m.toon('#67504A').color;
   const focus = new Vector3();
   return (camera, p) => {
@@ -119,6 +140,9 @@ export function buildStereo(room: Group, m: VinylMaterials): Motion {
     walls[0].color.copy(neutral).lerp(guides[0], ease(0.52, 0.68, p));
     walls[1].color.copy(neutral).lerp(guides[1], ease(0.66, 0.83, p));
     if (!profile) {
+      const high = ease(0.21, 0.235, p);
+      traceColors[0].copy(guides[0]).lerp(inactiveTrace, 0.66 * high);
+      traceColors[1].copy(guides[1]).lerp(inactiveTrace, 0.66 * (1 - high));
       pose(camera, [0.25, 11.8, 2.52], [0.12, 10.2, 3.37], [0, 1.33, -0.24], ease(0, 0.42, p));
       focus.set(0, 1.33, -0.24);
     } else {

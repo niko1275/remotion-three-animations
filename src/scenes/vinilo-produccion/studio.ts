@@ -134,19 +134,19 @@ export function buildStereo(room: Group, m: VinylMaterials): Motion {
   const neutral = m.toon('#67504A').color;
   const focus = new Vector3();
   return (camera, p) => {
-    const profile = p >= 0.43;
+    const profile = p >= 0.80;
     sample.visible = profile;
     samples.visible = !profile;
-    walls[0].color.copy(neutral).lerp(guides[0], ease(0.52, 0.68, p));
-    walls[1].color.copy(neutral).lerp(guides[1], ease(0.66, 0.83, p));
+    walls[0].color.copy(neutral).lerp(guides[0], ease(0.83, 0.88, p));
+    walls[1].color.copy(neutral).lerp(guides[1], ease(0.87, 0.92, p));
     if (!profile) {
-      const high = ease(0.21, 0.235, p);
+      const high = ease(0.39, 0.42, p);
       traceColors[0].copy(guides[0]).lerp(inactiveTrace, 0.66 * high);
       traceColors[1].copy(guides[1]).lerp(inactiveTrace, 0.66 * (1 - high));
-      pose(camera, [0.25, 11.8, 2.52], [0.12, 10.2, 3.37], [0, 1.33, -0.24], ease(0, 0.42, p));
+      pose(camera, [0.25, 11.8, 2.52], [0.12, 10.2, 3.37], [0, 1.33, -0.24], ease(0, 0.79, p));
       focus.set(0, 1.33, -0.24);
     } else {
-      camera.position.set(-0.94, 5.55, 13.90).lerp(profileEye, ease(0.43, 0.95, p));
+      camera.position.set(-0.94, 5.55, 13.90).lerp(profileEye, ease(0.80, 0.89, p));
       camera.near = 0.01;
       focus.copy(profileFocus);
     }

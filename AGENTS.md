@@ -4,12 +4,12 @@
 
 - Etapa 1 aprobada. Guion de 76 segundos y tratamiento voxel basados en la referencia aprobada y el brief.
 - Etapa 2 implementada para revisión. **Shorts → ViniloAnimatico** muestra ocho fichas provisionales con guion, cámara, acción, sonido, rótulos y cortes. La versión revisada por el usuario todavía muestra el modelo acústico en algunas fichas. Su reemplazo por un tocadiscos eléctrico es la primera corrección de producción.
-- Fuente de verdad: `src/timeline.ts`. Los inicios son acumulados. El total estimado es de 2280 fotogramas a 30 fps, en 1080 × 1920. Si se indica un audio en `voiceFiles`, Remotion mide su duración y desplaza las escenas siguientes. El ajuste conserva las pausas de entrada y salida de cada escena.
+- Fuente de verdad: `src/timeline.ts`. Los inicios son acumulados. El montaje base dura 2700 fotogramas a 30 fps, en 1080 × 1920. El guion reserva una idea por toma y un máximo de 1,7 palabras por segundo dentro de la ventana de voz. Si se indica un audio en `voiceFiles`, Remotion mide su duración y sincroniza rótulos, cámara y animaciones. Una toma breve se ajusta a su ventana de voz conservando el tono. Una toma larga extiende la escena y desplaza las siguientes. Se conservan las pausas de entrada y salida.
 - Las ocho escenas se trabajan sin locución. Se incorporará la voz con ElevenLabs cuando estén disponibles las tomas.
 - Guía `docs/ESTILO.md` aprobada. **Shorts → ViniloEscena1** presenta la apertura independiente, con surco continuo en V, tocadiscos eléctrico, amplificador y dos parlantes en el living. La cámara se aleja en un plano continuo. La revisión es silenciosa.
 - Escena 1 aprobada por el usuario. Se revisaron las capturas de los fotogramas 0, 135 y 269 a 1080 × 1920. La composición de revisión es **Shorts → ViniloEscena1**.
 - Variante del gancho para revisar en Remotion. «Estás dentro de una canción» abre desde el primer fotograma. El rótulo se retira antes de revelar la espiral, y el texto de voz queda en el timeline para ElevenLabs.
-- Escenas 2 a 8 construidas para revisión. **Shorts → ViniloCompleto** monta los ocho planos de producción en 2280 fotogramas. Las escenas 2–3 comparten el estudio, 4–5 comparten la fábrica y 6–8 reutilizan el living y el sistema eléctrico de la apertura. Cada bloque se revisó con capturas renderizadas desde la composición completa.
+- Escenas 2 a 8 construidas para revisión. **Shorts → ViniloCompleto** monta los ocho planos de producción. Las escenas 2–3 comparten el estudio, 4–5 comparten la fábrica y 6–8 reutilizan el living y el sistema eléctrico de la apertura. Cada bloque se revisó con capturas renderizadas desde la composición completa.
 
 ## Rigor
 

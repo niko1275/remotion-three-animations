@@ -17,7 +17,7 @@ export function ViniloCompleto({voiceFiles, voiceDurations}: VinylAudioProps) {
               : <ProductionScene sceneId={scene.id} duration={scene.durationInFrames} screenText={scene.screenText} />}
             {narration && (
               <Sequence from={scene.voiceLead} durationInFrames={scene.voiceDurationInFrames}>
-                <Html5Audio src={staticFile(narration)} />
+                <Html5Audio src={staticFile(narration)} playbackRate={scene.voicePlaybackRate} preservePitch />
               </Sequence>
             )}
           </Sequence>

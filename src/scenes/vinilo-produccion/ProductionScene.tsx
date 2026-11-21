@@ -2,7 +2,7 @@ import {useLayoutEffect, useRef} from 'react';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import '@fontsource/space-grotesk/latin-700.css';
 import {createVinylStage} from '../vinilo-apertura/render';
-import type {VinylSceneId} from '../../timeline';
+import {vinylVisualProgress, type VinylSceneId} from '../../timeline';
 import {buildCutting, buildStereo} from './studio';
 import {buildPlating, buildPress} from './factory';
 import {buildAmplification, buildClosing, buildPickup} from './playback';
@@ -36,7 +36,7 @@ export function ProductionScene({sceneId, duration, screenText}: {
     const motion = builders[sceneId](stage.room, stage.materials);
     draw.current = (f, d, speed) => {
       const t = f / speed;
-      const {focus, exposure, atmosphere} = motion(stage.camera, f / Math.max(1, d - 1), t, f, d);
+      const {focus, exposure, atmosphere} = motion(stage.camera, vinylVisualProgress(sceneId, f, d), t, f, d);
       stage.render(t, focus, exposure, atmosphere, true);
     };
     return () => {

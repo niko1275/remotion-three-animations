@@ -14,6 +14,7 @@ import {
   buildVinylTimeline,
   VINYL_FPS,
   vinylScenes,
+  vinylVisualProgress,
   type VoiceDurations,
   type VoiceFiles,
 } from '../timeline';
@@ -90,7 +91,7 @@ export function ViniloAnimatico({voiceFiles, voiceDurations}: VinylAudioProps) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const preview = useRef<ReturnType<typeof createVoxelPreview> | null>(null);
   const sceneId = scene.id;
-  const progress = localFrame / Math.max(1, scene.durationInFrames - 1);
+  const progress = vinylVisualProgress(sceneId, localFrame, scene.durationInFrames);
   const cut = localFrame >= scene.durationInFrames - VINYL_FPS;
 
   useLayoutEffect(() => {
@@ -131,7 +132,7 @@ export function ViniloAnimatico({voiceFiles, voiceDurations}: VinylAudioProps) {
       </section>
       {voiceFile && (
         <Sequence from={scene.from + scene.voiceLead} durationInFrames={scene.voiceDurationInFrames}>
-          <Html5Audio src={staticFile(voiceFile)} />
+          <Html5Audio src={staticFile(voiceFile)} playbackRate={scene.voicePlaybackRate} preservePitch />
         </Sequence>
       )}
     </AbsoluteFill>

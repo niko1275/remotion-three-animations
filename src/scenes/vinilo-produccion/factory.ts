@@ -64,13 +64,13 @@ export function buildPlating(room: Group, m: VinylMaterials): Motion {
   }
 
   return (camera, p) => {
-    const bath = p >= 0.55;
+    const bath = p >= 0.87;
     group.visible = !bath;
     tank.visible = bath;
     const deposit = ease(0.02, 0.29, p);
     nickel.visible = deposit > 0.001;
     nickel.scale.y = Math.max(0.001, deposit);
-    const separation = ease(0.29, 0.52, p);
+    const separation = ease(0.38, 0.63, p);
     nickel.position.copy(profilePosition);
     nickel.position.y += 1.14 * separation;
     nickel.rotation.x = -0.20 * separation;
@@ -81,11 +81,11 @@ export function buildPlating(room: Group, m: VinylMaterials): Motion {
     }
 
     copies.children.forEach((part, index) => {
-      const lift = ease(0.55 + index * 0.075, 0.78 + index * 0.065, p);
+      const lift = ease(0.87 + index * 0.018, 0.94 + index * 0.02, p);
       part.position.y = mix(0.81, 2.40, lift);
       part.rotation.y = 0.11 * (index - 1) * lift;
     });
-    const focus = pose(camera, [-7, 8.6, 17.2], [-4.9, 7.15, 14.8], [0, 2.06, -0.78], ease(0.55, 1, p));
+    const focus = pose(camera, [-7, 8.6, 17.2], [-4.9, 7.15, 14.8], [0, 2.06, -0.78], ease(0.87, 1, p));
     return {focus};
   };
 }

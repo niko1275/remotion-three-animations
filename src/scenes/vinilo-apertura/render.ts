@@ -4,6 +4,7 @@ import {
   PlaneGeometry, Points, PointsMaterial, Scene, ShaderMaterial, SRGBColorSpace, Vector2, Vector3, WebGLRenderer,
   WebGLRenderTarget, type Material,
 } from 'three';
+import {vinylVisualProgress} from '../../timeline';
 import {buildLiving} from './living';
 import {buildMaterials, palette} from './materials';
 import {buildPlayer, DISC_Y, DISC_Z, groovePoint, TAU} from './vinyl';
@@ -198,8 +199,8 @@ export function createVinylStage(canvas: HTMLCanvasElement, width: number, heigh
   return {room, materials, camera, render, dispose};
 }
 
-export function setOpeningCamera(camera: PerspectiveCamera, frame: number, durationInFrames: number, fps: number, overrideSpin?: number) {
-  const p = frame / Math.max(1, durationInFrames - 1);
+export function setOpeningCamera(camera: PerspectiveCamera, frame: number, durationInFrames: number, fps: number, overrideSpin?: number, overrideProgress?: number) {
+  const p = overrideProgress ?? frame / Math.max(1, durationInFrames - 1);
   const t = frame / fps;
   const spin = overrideSpin ?? frame * TAU / 54;
   const reveal = eased(0.09, 0.63, p);
@@ -222,7 +223,8 @@ export function createVinylOpening(canvas: HTMLCanvasElement, width: number, hei
   buildLiving(stage.room, stage.materials);
   const {disc} = buildPlayer(stage.room, stage.materials);
   function draw(frame: number, durationInFrames: number, fps: number) {
-    const {focus, spin, p, exposure} = setOpeningCamera(stage.camera, frame, durationInFrames, fps);
+    const progress = vinylVisualProgress('apertura', frame, durationInFrames);
+    const {focus, spin, p, exposure} = setOpeningCamera(stage.camera, frame, durationInFrames, fps, undefined, progress);
     disc.rotation.y = -spin;
     stage.render(frame / fps, focus, exposure, {beam: p > 0.45, dust: p > 0.36});
   }

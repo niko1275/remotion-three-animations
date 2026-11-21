@@ -110,7 +110,7 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
     new Vector3(2.23, 1.52, -1.92), new Vector3(2.45, 1.09, -1.85),
   ]);
   return (camera, p, t) => {
-    const reveal = p >= 0.49;
+    const reveal = p >= 0.415;
     const lower = ease(0.02, 0.22, p);
     const spin = t * TAU / 1.8;
     disc.rotation.y = -spin;
@@ -122,16 +122,16 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
     model.position.set(1.035, housingY, 0.52);
     model.rotation.y = -0.30;
     cantilever.rotation.y = 0.14 * Math.sin(t * 37) + 0.055 * Math.sin(t * 71);
-    signal.visible = p > 0.73;
-    line.getPointAt(ease(0.73, 0.98, p), signal.position);
+    signal.visible = p > 0.798;
+    line.getPointAt(ease(0.798, 0.98, p), signal.position);
     needle.localToWorld(needleTip.set(0, -0.0225, 0));
     traceGroove(needleTip, spin, reveal ? 0 : 0.75 * ease(0.22, 0.28, p));
     if (!reveal) {
-      const focus = pose(camera, [2.37, 2.56, 2.43], [1.78, 2.32, 1.90], [1.08, 2.10, 0.70], ease(0, 0.49, p));
-      focus.y -= 0.045 * ease(0.22, 0.47, p);
+      const focus = pose(camera, [2.37, 2.56, 2.43], [1.78, 2.32, 1.90], [1.08, 2.10, 0.70], ease(0, 0.415, p));
+      focus.y -= 0.045 * ease(0.22, 0.41, p);
       return {focus, exposure: 1.25, atmosphere: {beam: false, dust: false}};
     }
-    const progress = ease(0.72, 0.98, p);
+    const progress = ease(0.798, 0.98, p);
     const focus = pose(camera, [1.43, 2.56, 2.77], [3.56, 3.07, 3.87], [1.03, 2.12, 0.57], progress);
     focus.lerp(new Vector3(1.87, 1.88, -0.70), progress);
     return {focus, exposure: 1.15, atmosphere: {beam: false, dust: false}};
@@ -139,7 +139,7 @@ export function buildPickup(room: Group, m: VinylMaterials): Motion {
 }
 
 export function buildAmplification(room: Group, m: VinylMaterials): Motion {
-  const {disc, cones, signalCables} = system(room, m);
+  const {disc, signalCables} = system(room, m);
   // A pair of readouts on the phono stage represent the two frequency bands.
   const readout = new Group();
   room.add(readout);
@@ -148,19 +148,10 @@ export function buildAmplification(room: Group, m: VinylMaterials): Motion {
   const treble = m.block(readout, [0.137, 0.168, 0.016], [-0.13, 0.692, 1.362], '#89A9BB', 0.007, false);
   const signal = signalDot(room, 0.052);
   const [input, , right] = signalCables;
-  const coneOrigins = cones.map((cone) => cone.position.z);
-  const rightWoofer = cones[2];
-  const waveOrigin = room.worldToLocal(rightWoofer.getWorldPosition(new Vector3()));
-  const waveRing = new RingGeometry(0.316, 0.33, 56);
-  const airWaves = Array.from({length: 3}, () => {
-    const wave = new Mesh(waveRing, new MeshBasicMaterial({color: palette.warm, transparent: true, depthWrite: false}));
-    room.add(wave);
-    return wave;
-  });
 
   return (camera, p, t) => {
     disc.rotation.y = -t * TAU / 1.8;
-    const correction = ease(0.30, 0.64, p);
+    const correction = ease(0.24, 0.59, p);
     bass.scale.y = mix(0.41, 0.83, correction) * (1 + Math.sin(t * 8) * 0.052);
     treble.scale.y = mix(1, 0.60, correction) * (1 + Math.sin(t * 11) * 0.064);
     bass.position.y = 0.608 + bass.scale.y * 0.084;
@@ -169,20 +160,7 @@ export function buildAmplification(room: Group, m: VinylMaterials): Motion {
     if (p < 0.31) input.getPointAt(ease(0, 0.31, p), signal.position);
     else right.getPointAt(ease(0.45, 0.88, p), signal.position);
     signal.visible = p < 0.31 || (p >= 0.45 && p <= 0.89);
-    const playback = ease(0.73, 0.91, p);
-    cones.forEach((cone, index) => {
-      cone.position.z = coneOrigins[index] + Math.sin(t * (index % 2 ? 17 : 22)) * 0.026 * playback;
-    });
-    // Expanding contours visualize the pressure wave leaving the right speaker.
-    airWaves.forEach((wave, index) => {
-      const travel = (t * 1.25 + index / airWaves.length) % 1;
-      wave.visible = playback > 0;
-      wave.position.copy(waveOrigin);
-      wave.position.z += 0.05 + travel * 0.55;
-      wave.scale.setScalar(0.98 + travel * 0.66);
-      wave.material.opacity = 0.53 * playback * Math.sin(Math.PI * travel);
-    });
-    const pan = ease(0.53, 0.99, p);
+    const pan = ease(0.55, 0.89, p);
     const focus = pose(camera, [1.30, 1.77, 5.40], [6.02, 3.02, 11.18], [-0.04, 0.76, 1.22], pan);
     focus.lerp(new Vector3(2.4, 1.32, 0.0), pan);
     return {focus, exposure: mix(1.25, 1.0, pan)};
@@ -196,6 +174,16 @@ export function buildClosing(room: Group, m: VinylMaterials): Motion {
   person.rotation.y = 0.57;
   contactShade(room, m, 1.17, 0.99, [listenerPosition[0], 0.145, listenerPosition[2]]);
   const coneOrigins = cones.map((cone) => cone.position.z);
+  const waveRing = new RingGeometry(0.316, 0.33, 56);
+  const airWaves = [cones[0], cones[2]].map((woofer) => {
+    const origin = room.worldToLocal(woofer.getWorldPosition(new Vector3()));
+    const rings = Array.from({length: 3}, () => {
+      const ring = new Mesh(waveRing, new MeshBasicMaterial({color: palette.warm, transparent: true, depthWrite: false}));
+      room.add(ring);
+      return ring;
+    });
+    return {origin, rings};
+  });
   const openingFrames = vinylTimeline.scenes[0].durationInFrames;
   const listeningEye = new Vector3(12, 9.7, 28.75);
   const listeningFocus = new Vector3(-0.80, 2.4, 0.55);
@@ -204,16 +192,26 @@ export function buildClosing(room: Group, m: VinylMaterials): Motion {
     const remaining = durationInFrames - 1 - frame;
     const spin = -remaining * TAU / 54;
     disc.rotation.y = -spin;
-    const playing = 1 - ease(0.36, 0.55, p);
+    const playing = 1 - ease(0.48, 0.60, p);
     cones.forEach((cone, index) => {
       cone.position.z = coneOrigins[index] + Math.sin(t * 22 + index * 0.4) * 0.033 * playing;
     });
+    for (const {origin, rings} of airWaves) {
+      rings.forEach((ring, index) => {
+        const travel = (t * 1.25 + index / rings.length) % 1;
+        ring.visible = playing > 0;
+        ring.position.copy(origin);
+        ring.position.z += 0.05 + travel * 0.55;
+        ring.scale.setScalar(0.98 + travel * 0.66);
+        ring.material.opacity = 0.58 * playing * Math.sin(Math.PI * travel);
+      });
+    }
     head.rotation.z = 0.105 + Math.sin(t * 2.3) * 0.022;
     head.rotation.x = 0.065;
     person.visible = p < 0.76;
-    const rewind = 1 - ease(0.42, 1, p);
+    const rewind = 1 - ease(0.55, 1, p);
     const opening = setOpeningCamera(camera, rewind * (openingFrames - 1), openingFrames, VINYL_FPS, spin);
-    const onListener = 1 - ease(0.35, 0.64, p);
+    const onListener = 1 - ease(0.51, 0.74, p);
     camera.position.lerp(listeningEye, onListener);
     return {
       focus: opening.focus.lerp(listeningFocus, onListener),

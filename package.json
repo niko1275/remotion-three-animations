@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "remotion studio src/index.ts",
+    "start": "remotion studio src/index.ts --no-open",
     "typecheck": "tsc --noEmit",
     "build": "remotion bundle src/index.ts",
     "render": "remotion render src/index.ts Orbit out/orbit.mp4 --gl=angle",

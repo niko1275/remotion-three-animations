@@ -1,4 +1,5 @@
 import {ViniloCompleto} from './compositions/ViniloCompleto';
+import {CuatroTintasApertura, printOpeningFrames} from './scenes/cuatro-tintas/CuatroTintasApertura';
 import {openingDurationInFrames, ViniloEscena1} from './scenes/vinilo-apertura/ViniloEscena1';
 import {animaticDefaultProps, calculateVinylMetadata, ViniloAnimatico} from './compositions/ViniloAnimatico';
 import {VINYL_FPS, VINYL_HEIGHT, VINYL_WIDTH, vinylTimeline} from './timeline';
@@ -18,6 +19,7 @@ export const Root = () => <>
     <Composition id="GraphicPortrait" component={GraphicCharacterStudy} durationInFrames={120} fps={30} width={1080} height={1440} defaultProps={{view:'face' as const,expression:'worried' as const}}/>
   </Folder>
   <Folder name="Shorts">
+    <Composition id="CuatroTintasApertura" component={CuatroTintasApertura} durationInFrames={printOpeningFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT}/>
     <Composition id="ViniloCompleto" component={ViniloCompleto} durationInFrames={vinylTimeline.durationInFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT} defaultProps={animaticDefaultProps} calculateMetadata={calculateVinylMetadata}/>
     <Composition id="ViniloEscena1" component={ViniloEscena1} durationInFrames={openingDurationInFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT}/>
     <Composition id="ViniloAnimatico" component={ViniloAnimatico} durationInFrames={vinylTimeline.durationInFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT} defaultProps={animaticDefaultProps} calculateMetadata={calculateVinylMetadata}/>

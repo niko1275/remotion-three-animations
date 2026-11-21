@@ -1,12 +1,12 @@
 import {
-  CatmullRomCurve3, DirectionalLight, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneGeometry,
+  CatmullRomCurve3, Color, DirectionalLight, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneGeometry,
   RingGeometry, ShaderMaterial, SphereGeometry, TubeGeometry, Vector3, type Texture,
 } from 'three';
 import {createVinylStage} from '../vinilo-apertura/render';
 import {bench, workRoom} from '../vinilo-produccion/sets';
 import {paintInkProof} from './ink-proof';
 import {buildNozzleCutaway} from './nozzle';
-import {buildInkjetPrinter, inkColors} from './printer';
+import {buildInkjetPrinter, inkColors, nozzleZ} from './printer';
 import {printFullFrames, printLoopFrames, printOpeningFrames, printScenes} from './timeline';
 
 export const landscapeFile = 'cuatro-tintas/paisaje.png';
@@ -18,6 +18,10 @@ const paperHeight = 2.8;
 const paperStart = 1.985;
 const paperEnd = 2.59;
 const ease = (progress: number, start: number, end: number) => MathUtils.smoothstep(progress, start, end);
+const firstBand = 0.15;
+const repeatPasses = 8;
+const repeatBand = (1 - firstBand) / repeatPasses;
+const paperUnderHead = (bandCenter: number) => nozzleZ + imageSize * (bandCenter - 0.5);
 
 function printedLandscape(landscape: Texture) {
   return new Mesh(new PlaneGeometry(imageSize, imageSize), new ShaderMaterial({
@@ -98,7 +102,7 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
   workRoom(room, m, true);
   bench(room, m, 0, 0.11, 6.05, 4.04);
 
-  const {printer, photo, carriage, pose} = buildInkjetPrinter(room, m);
+  const {printer, photo, carriage, pose, revealChannels} = buildInkjetPrinter(room, m);
   m.block(photo, [imageSize + 0.13, paperHeight + 0.14, 0.018], [0, 0, 0], '#EAE5D4', 0.008, false);
   const sheet = printedLandscape(texture);
   sheet.position.z = 0.010;
@@ -111,15 +115,16 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
   const channels = new Group();
   carriage.add(channels);
   const beadGeometry = new SphereGeometry(0.038, 14, 10);
+  const lightInk = new Color('#E4F6FF');
   const reservoirPaths = inkColors.map((color, index) => {
     const x = (index - 1.5) * 0.225;
     const path = new CatmullRomCurve3([
-      new Vector3(x, 0.16, 0.332), new Vector3(x, -0.12, 0.355),
-      new Vector3(x * 0.69, -0.26, 0.316), new Vector3(x * 0.69, -0.35, 0.205),
+      new Vector3(x, 0.125, 0.155), new Vector3(x, -0.095, 0.168),
+      new Vector3(x * 0.69, -0.237, 0.12), new Vector3(x * 0.69, -0.335, 0.050),
     ]);
     const material = new MeshBasicMaterial({color});
     channels.add(new Mesh(new TubeGeometry(path, 18, 0.020, 6, false), material));
-    const bead = new Mesh(beadGeometry, material);
+    const bead = new Mesh(beadGeometry, new MeshBasicMaterial({color: new Color(color).lerp(lightInk, 0.52)}));
     channels.add(bead);
     return {path, bead};
   });
@@ -193,8 +198,7 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
   function returnToLeaf(t: number, p: number, test: boolean) {
     const approach = ease(p, test ? 0.16 : 0.47, 0.99);
     const cover = 1 - ease(p, 0.83, 1);
-    const exit = test ? 1 : ease(p, 0, 0.31);
-    const feed = exit * (1 - ease(p, 0.86, 1));
+    const feed = 1 - ease(p, 0.86, 1);
     pose(MathUtils.lerp(paperStart, paperEnd, feed), cover);
     inkOnSheet(1, 0, 0, false, cover);
     onPaper(ease(p, 0.72, 1));
@@ -204,27 +208,34 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
   }
 
   function printing(t: number, p: number, accelerated: boolean) {
-    const count = accelerated ? 8 : 1;
-    const overall = count * (accelerated ? ease(p, 0.04, 0.88) : ease(p, 0.15, 0.78));
+    const count = accelerated ? repeatPasses : 1;
+    const overall = accelerated
+      ? 2 * ease(p, 0.03, 0.37) + (count - 2) * ease(p, 0.37, 0.83)
+      : ease(p, 0.13, 0.88);
     const index = Math.min(count - 1, Math.floor(overall));
     const stroke = overall - index;
     const sweep = ease(stroke, 0.04, 0.79);
     const reversed = (index + Number(accelerated)) % 2 === 1;
-    const carriageX = MathUtils.lerp(-1.09, 1.09, reversed ? 1 - sweep : sweep);
-    const advance = (index + ease(stroke, 0.83, 1)) / count;
-    const z = accelerated ? MathUtils.lerp(-0.59, paperStart, advance) : MathUtils.lerp(-0.91, -0.59, advance);
-    pose(z, 1, carriageX);
-    const printed = accelerated ? 0.15 + 0.85 * index / count : 0;
-    const band = accelerated ? 0.85 / count : 0.15;
-    inkOnSheet(overall >= count ? printed + band : printed, band, sweep, reversed);
+    const carriageX = MathUtils.lerp(-imageSize / 2, imageSize / 2, reversed ? 1 - sweep : sweep);
+    const printed = accelerated ? firstBand + repeatBand * index : 0;
+    const band = accelerated ? repeatBand : firstBand;
+    const advance = (band + repeatBand) / 2 * ease(stroke, 0.83, 1);
+    const printZ = paperUnderHead(printed + band / 2 + advance);
+    const eject = accelerated ? ease(p, 0.83, 0.98) : 0;
+    const z = MathUtils.lerp(printZ, paperEnd, eject);
+    pose(z, 1, MathUtils.lerp(carriageX, 0.02, eject));
+    // At the end of a stroke, keep the completed rows and clear the partial row.
+    if (stroke >= 0.79) inkOnSheet(printed + band);
+    else inkOnSheet(printed, band, sweep, reversed);
     spray.visible = stroke > 0.07 && stroke < 0.80;
-    spray.position.set(carriageX, 0.49, -0.17);
+    spray.position.set(carriageX, 0.503, nozzleZ);
     drops.forEach((drop, i) => {
       const fall = (t * 5.7 + i * 0.22) % 1;
-      drop.position.y = 0.26 * (1 - fall);
+      drop.visible = Math.abs(carriageX + drop.position.x) < imageSize / 2;
+      drop.position.y = 0.132 * (1 - fall);
     });
-    aim(0, 0.72, accelerated ? MathUtils.lerp(0.32, 1.27, ease(p, 0.28, 0.94)) : 0.16);
-    shoot(t, accelerated ? 13.7 : 10.0, accelerated ? 0.14 : -0.08, accelerated ? 0.87 : 1.01);
+    aim(0, 0.72, accelerated ? MathUtils.lerp(0.32, 1.19, ease(p, 0.48, 0.96)) : 0.11);
+    shoot(t, accelerated ? 14.1 : 9.6, accelerated ? 0.14 : -0.08, accelerated ? 0.87 : 1.04);
   }
 
   function draw(frame: number, fps: number, full: boolean) {
@@ -234,6 +245,7 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
     marker.visible = false;
     channels.visible = false;
     spray.visible = false;
+    revealChannels(0);
     laboratoryLight.intensity = 0;
     if (frame < printOpeningFrames || frame === last) {
       opening(frame === last ? 0 : frame, fps);
@@ -249,15 +261,17 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
     const t = frame / fps;
     switch (scene.id) {
       case 'rodillos':
-        pose(MathUtils.lerp(-1.47, -0.91, ease(p, 0.11, 0.84)), 1, 1.22);
+        pose(MathUtils.lerp(-2.41, paperUnderHead(firstBand / 2), ease(p, 0.16, 0.78)), 1, 1.22);
         inkOnSheet(0);
-        aim(-0.13, 0.64, -0.96);
-        shoot(t, MathUtils.lerp(12.5, 9.4, ease(p, 0.04, 0.93)), 0.17, 1.08);
+        aim(-0.23, 0.59, MathUtils.lerp(-1.16, -0.94, ease(p, 0.50, 0.93)));
+        shoot(t, MathUtils.lerp(11.5, 7.1, ease(p, 0.04, 0.83)), 0.17, 1.08);
         return;
       case 'cabezal':
-        pose(-0.91, 1, -0.15);
+        pose(paperUnderHead(firstBand / 2), 1, -0.15);
         inkOnSheet(0);
-        channels.visible = true;
+        const cutaway = ease(p, 0.06, 0.27);
+        revealChannels(cutaway);
+        channels.visible = cutaway > 0.20;
         reservoirPaths.forEach(({path, bead}, i) => path.getPointAt((p * 1.65 + i * 0.19) % 1, bead.position));
         aim(-0.15, 0.92, -0.09);
         shoot(t, MathUtils.lerp(8.8, 5.55, ease(p, 0.05, 0.91)), 0.14, 0.58);
@@ -267,8 +281,9 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
         nozzle.cutaway.visible = true;
         laboratoryLight.intensity = 1.52;
         nozzle.pose(p);
-        focus.set(0, 2.06, 0.22);
-        shoot(t, MathUtils.lerp(14.4, 12.8, ease(p, 0.05, 0.82)), 0.11, 0.19);
+        const landing = ease(p, 0.68, 0.96);
+        focus.set(0, nozzle.cutaway.position.y + MathUtils.lerp(2.06, 1.44, landing), 0.22);
+        shoot(t, MathUtils.lerp(13.7, 11.1, ease(p, 0.05, 0.95)), 0.11, MathUtils.lerp(0.19, 0.36, landing));
         return;
       case 'pasada':
       case 'franjas':

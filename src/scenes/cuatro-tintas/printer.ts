@@ -4,6 +4,7 @@ import {palette, type VinylMaterials} from '../vinilo-apertura/materials';
 const paperSlope = 0.11;
 const outputLip = 1.17;
 export const inkColors = ['#149CB1', '#C94079', '#F3D356', '#303033'];
+export const nozzleZ = -0.196;
 const paperHeightAt = (z: number) => 0.47 - Math.max(0, z - outputLip) * Math.tan(paperSlope);
 
 export function buildInkjetPrinter(room: Group, m: VinylMaterials) {
@@ -33,16 +34,28 @@ export function buildInkjetPrinter(room: Group, m: VinylMaterials) {
   }
   crossBar(0.070, 3.78, palette.nickel, 0, 1.035, -0.47);
   crossBar(0.058, 3.58, '#929E99', 0, 0.57, 0.86);
-  const rollers = [-1.10, 0.86].flatMap((z) => [-1.05, -0.53, 0, 0.53, 1.05]
-    .map((x) => crossBar(0.109, 0.29, '#364047', x, 0.59, z)));
+  const rollers = [-1.10, 0.86].flatMap((z) => [-1.05, -0.53, 0, 0.53, 1.05].map((x) => {
+    const roller = crossBar(0.109, 0.29, '#364047', x, 0.59, z);
+    for (const side of [-1, 1]) {
+      m.block(roller, [0.028, 0.241, 0.015], [0, 0, side * 0.105], '#5B6B73', 0.005, false);
+    }
+    return roller;
+  }));
   crossBar(0.058, 3.58, '#929E99', 0, 0.59, -1.10);
   m.block(printer, [3.76, 0.083, 0.115], [0, 1.16, -0.65], '#333D42', 0.018);
 
   const carriage = new Group();
   carriage.position.set(1.17, 0.93, -0.23);
   printer.add(carriage);
-  m.block(carriage, [1.04, 0.54, 0.66], [0, 0, 0], '#4F5A60', 0.056);
+  m.block(carriage, [1.04, 0.54, 0.36], [0, 0, -0.15], '#4F5A60', 0.056);
+  for (const side of [-1, 1]) {
+    m.block(carriage, [0.11, 0.46, 0.36], [side * 0.46, -0.015, 0.16], '#596771', 0.024);
+  }
+  const coverPlate = m.block(carriage, [0.96, 0.42, 0.08], [0, -0.018, 0.28], '#4F5A60', 0.035);
   m.block(carriage, [0.82, 0.08, 0.35], [0, -0.30, 0.034], palette.nickel, 0.025);
+  for (let index = 0; index < 8; index++) {
+    m.block(carriage, [0.034, 0.026, 0.043], [(index - 3.5) * 0.087, -0.29, 0.213], '#37464B', 0.009, false);
+  }
   const cartridges = inkColors.map((color, i) => {
     const cartridge = m.block(carriage, [0.19, 0.29, 0.43], [(i - 1.5) * 0.225, 0.20, 0.075], color, 0.027, false);
     cartridge.material = cartridge.material.clone();
@@ -72,7 +85,7 @@ export function buildInkjetPrinter(room: Group, m: VinylMaterials) {
     photo.rotation.x = -Math.PI / 2 + paperSlope * MathUtils.smoothstep(z, 0.55, 1.70);
     carriage.position.x = carriageX ?? MathUtils.lerp(1.17, 0.07, MathUtils.smoothstep(cover, 0.44, 1));
     interiorLamp.intensity = 34 * cover;
-    rollers.forEach((roller) => roller.rotation.set(0, -z / 0.109, Math.PI / 2, 'ZYX'));
+    rollers.forEach((roller) => roller.rotation.set(0, z / 0.109, Math.PI / 2, 'ZYX'));
     cartridges.forEach(({material, color}, i) => {
       const selected = i === 0 || i === 2;
       material.color.copy(color).lerp(unlitInk, selected ? 0 : greenInk);
@@ -86,5 +99,10 @@ export function buildInkjetPrinter(room: Group, m: VinylMaterials) {
     });
   }
 
-  return {printer, photo, carriage, pose};
+  function revealChannels(amount: number) {
+    coverPlate.position.set(1.18 * amount, -0.018 + 0.24 * amount, 0.28 - 0.38 * amount);
+    coverPlate.rotation.y = -0.48 * amount;
+  }
+
+  return {printer, photo, carriage, pose, revealChannels};
 }

@@ -1,0 +1,92 @@
+.vinilo-animatico {
+  --ink: #1B1714;
+  --cream: #F4D58A;
+  --slate: #4A5560;
+  container-type: inline-size;
+  background: #C9D2BE;
+  color: var(--ink);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.vinilo-animatico-header {
+  position: absolute;
+  inset: 5.4% 7% auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 3cqw;
+  padding-bottom: 2.2cqw;
+  border-bottom: .15cqw solid currentColor;
+  font: 500 2.6cqw "JetBrains Mono", monospace;
+}
+
+.vinilo-animatico-plan {
+  position: absolute;
+  inset: 10% 7% auto;
+}
+
+.vinilo-animatico-time {
+  font: 500 3cqw "JetBrains Mono", monospace;
+}
+
+.vinilo-animatico h1 {
+  margin: 2cqw 0 1.8cqw;
+  font-size: 6.9cqw;
+  line-height: 1;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+
+.vinilo-animatico-preview {
+  position: absolute;
+  inset: 19% 7% auto;
+  display: block;
+  width: 86%;
+  height: auto;
+  border: .15cqw solid var(--ink);
+}
+
+.vinilo-animatico-note {
+  position: absolute;
+  inset: 71% 7% auto;
+  display: grid;
+  grid-template-columns: 13cqw 1fr;
+  align-items: baseline;
+  gap: 2.4cqw;
+  color: var(--ink);
+  font-size: 3.4cqw;
+  line-height: 1.17;
+}
+
+.vinilo-animatico-note span {
+  font: 500 2.55cqw "JetBrains Mono", monospace;
+  text-transform: uppercase;
+}
+
+.vinilo-animatico-overlay {
+  position: absolute;
+  inset: 65% 7% auto;
+  text-align: center;
+  color: #fff;
+  paint-order: stroke fill;
+  -webkit-text-stroke: .55cqw var(--ink);
+  font-size: 6.15cqw;
+  font-weight: 700;
+}
+
+.vinilo-animatico-voice {
+  position: absolute;
+  inset: 79% 7% auto;
+  padding-top: 2.5cqw;
+  border-top: .15cqw solid currentColor;
+}
+
+.vinilo-animatico-voice div {
+  font: 500 2.55cqw "JetBrains Mono", monospace;
+  text-transform: uppercase;
+}
+
+.vinilo-animatico-voice p {
+  margin: 1.3cqw 0 0;
+  font-size: 4.05cqw;
+  line-height: 1.19;
+}

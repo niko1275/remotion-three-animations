@@ -7,10 +7,11 @@ export const printOpeningFrames = 360;
 export const printLoopFrames = 504;
 const photoWidth = 2.24;
 const photoHeight = 2.8;
+const portraitSize = photoWidth;
 const ease = (progress: number, start: number, end: number) => MathUtils.smoothstep(progress, start, end);
 
 function printedPhoto(portrait: Texture) {
-  return new Mesh(new PlaneGeometry(photoWidth, photoHeight), new ShaderMaterial({
+  return new Mesh(new PlaneGeometry(portraitSize, portraitSize), new ShaderMaterial({
     uniforms: {portrait: {value: portrait}},
     vertexShader: `
       varying vec2 paperUV;
@@ -22,7 +23,7 @@ function printedPhoto(portrait: Texture) {
     fragmentShader: `
       uniform sampler2D portrait;
       varying vec2 paperUV;
-      const vec2 lines = vec2(142.0, 177.5);
+      const vec2 lines = vec2(142.0);
 
       // A display simulation of CMYK separation with partial gray replacement.
       vec4 density(vec3 rgb) {
@@ -92,7 +93,7 @@ export function createPrintOpening(canvas: HTMLCanvasElement, width: number, hei
   const openYaw = 0.18;
 
   function paperFocus(scan: number) {
-    photo.localToWorld(eye.set(-0.176 + 0.028 * scan, 0.43 - 0.016 * scan, sheet.position.z));
+    photo.localToWorld(eye.set(0.068 + 0.028 * scan, 0.228 - 0.016 * scan, sheet.position.z));
     photo.localToWorld(center.set(0, 0, sheet.position.z));
   }
 

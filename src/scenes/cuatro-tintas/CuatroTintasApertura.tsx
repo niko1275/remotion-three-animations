@@ -2,9 +2,15 @@ import {useLayoutEffect, useRef, useState} from 'react';
 import {AbsoluteFill, interpolate, staticFile, useCurrentFrame, useDelayRender, useVideoConfig} from 'remotion';
 import {TextureLoader} from 'three';
 import '@fontsource/space-grotesk/latin-700.css';
-import {createPrintOpening, printOpeningFrames} from './print';
+import {createPrintOpening} from './print';
 
 const clamped = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+const portraitFile = 'cuatro-tintas/calamardo.jpg';
+const captions = [
+  {text: '¿Cómo llegó la tinta?', frames: [0, 9, 97, 122]},
+  {text: 'Hasta la facha se imprime', frames: [149, 160, 218, 231]},
+  {text: 'Dentro de la impresora', frames: [231, 255, 334, 356]},
+];
 
 export function CuatroTintasApertura() {
   const frame = useCurrentFrame();
@@ -23,7 +29,7 @@ export function CuatroTintasApertura() {
   useLayoutEffect(() => {
     const surface = canvas.current!;
     let disposed = false;
-    const portrait = new TextureLoader().load(staticFile('cuatro-tintas/retrato.png'), (loaded) => {
+    const portrait = new TextureLoader().load(staticFile(portraitFile), (loaded) => {
       if (disposed) return;
       try {
         scene.current = createPrintOpening(surface, width, height, loaded);
@@ -33,7 +39,7 @@ export function CuatroTintasApertura() {
         cancelRender(error instanceof Error ? error : new Error(String(error)));
       }
     }, undefined, () => {
-      if (!disposed) cancelRender(new Error('No se pudo cargar cuatro-tintas/retrato.png.'));
+      if (!disposed) cancelRender(new Error(`No se pudo cargar ${portraitFile}.`));
     });
 
     return () => {
@@ -45,11 +51,8 @@ export function CuatroTintasApertura() {
     };
   }, [cancelRender, continueRender, fps, handle, height, width]);
 
-  const p = frame / (printOpeningFrames - 1);
-  const title = p < 0.34 ? '¿Cómo llegó la tinta?' : 'Dentro de la impresora';
-  const opacity = p < 0.34
-    ? interpolate(p, [0, 0.025, 0.27, 0.34], [0, 1, 1, 0], clamped)
-    : interpolate(p, [0.64, 0.71, 0.93, 0.99], [0, 1, 1, 0], clamped);
+  const caption = captions.find(({frames}) => frame >= frames[0] && frame < frames[3]);
+  const opacity = caption ? interpolate(frame, caption.frames, [0, 1, 1, 0], clamped) : 0;
   return (
     <AbsoluteFill style={{backgroundColor: '#929D8B'}}>
       <canvas ref={canvas} style={{display: 'block', width: '100%', height: '100%'}} />
@@ -60,7 +63,7 @@ export function CuatroTintasApertura() {
           color: '#fff', WebkitTextStroke: `${width * 4 / 1080}px #1B1714`, paintOrder: 'stroke fill',
           lineHeight: 1.05, opacity,
         }}>
-          {title}
+          {caption?.text}
         </div>
       )}
     </AbsoluteFill>

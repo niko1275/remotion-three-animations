@@ -1,6 +1,7 @@
 import {
   CylinderGeometry, Group, MathUtils, Mesh, MeshBasicMaterial, RingGeometry, SphereGeometry, Vector3,
 } from 'three';
+import {platingTiming} from '../../timeline';
 import {palette, type VinylMaterials} from '../vinilo-apertura/materials';
 import {grooveSample, profileEye, profileFocus, profilePosition} from './groove';
 import {contactShade, workRoom} from './sets';
@@ -35,7 +36,6 @@ export function buildPlating(room: Group, m: VinylMaterials): Motion {
   contactShade(tank, m, 4.88, 4.04, [0, 0.127, -0.46]);
   m.block(tank, [0.13, 2.0, 0.14], [1.98, 2.48, -1.61], palette.slate, 0.031);
   m.block(tank, [3.93, 0.125, 0.14], [0.1, 3.39, -1.61], palette.nickel, 0.029);
-  for (const x of [-1.41, 0, 1.41]) m.block(tank, [0.038, 0.41, 0.042], [x, 3.17, -1.61], palette.nickel, 0.01, false);
 
   const group = new Group();
   room.add(group);
@@ -46,12 +46,11 @@ export function buildPlating(room: Group, m: VinylMaterials): Motion {
   const nickel = grooveSample(group, m, 'niquel').sample;
   nickel.position.copy(profilePosition);
 
-  const copies = new Group();
-  tank.add(copies);
-  for (let i = 0; i < 3; i++) {
+  const copies = [-1.4, 0, 1.4].map((x, i) => {
     const plate = new Group();
-    plate.position.set((i - 1) * 1.4, 2.61, -1.59);
-    copies.add(plate);
+    plate.position.set(x, 0.81, -1.59);
+    tank.add(plate);
+    const hanger = m.block(tank, [0.038, 1, 0.042], [x, 0, -1.61], palette.nickel, 0.01, false);
     const face = m.model(plate, new CylinderGeometry(0.58, 0.58, 0.071, 65),
       i === 1 ? '#BEAAA0' : palette.nickel, [0, 0, 0], true);
     face.rotation.x = Math.PI / 2;
@@ -61,16 +60,23 @@ export function buildPlating(room: Group, m: VinylMaterials): Motion {
       ring.position.z = 0.041;
       plate.add(ring);
     }
-  }
+    return {plate, hanger};
+  });
+  const stampRing = new Mesh(new RingGeometry(0.551, 0.574, 72), new MeshBasicMaterial({
+    color: palette.warm, transparent: true, opacity: 0, depthWrite: false,
+  }));
+  stampRing.position.z = 0.047;
+  copies[2].plate.add(stampRing);
 
   return (camera, p) => {
-    const bath = p >= 0.87;
+    const frame = p * (platingTiming.duration - 1);
+    const bath = frame >= platingTiming.copies;
     group.visible = !bath;
     tank.visible = bath;
-    const deposit = ease(0.02, 0.29, p);
+    const deposit = ease(6, platingTiming.separate, frame);
     nickel.visible = deposit > 0.001;
     nickel.scale.y = Math.max(0.001, deposit);
-    const separation = ease(0.38, 0.63, p);
+    const separation = ease(platingTiming.separate, 126, frame);
     nickel.position.copy(profilePosition);
     nickel.position.y += 1.14 * separation;
     nickel.rotation.x = -0.20 * separation;
@@ -80,12 +86,20 @@ export function buildPlating(room: Group, m: VinylMaterials): Motion {
       return {focus: profileFocus.clone().add(new Vector3(0, separation * 0.46, 0))};
     }
 
-    copies.children.forEach((part, index) => {
-      const lift = ease(0.87 + index * 0.018, 0.94 + index * 0.02, p);
-      part.position.y = mix(0.81, 2.40, lift);
-      part.rotation.y = 0.11 * (index - 1) * lift;
+    copies.forEach(({plate, hanger}, index) => {
+      const liftStart = platingTiming.copies + 5 + index * 25;
+      const lift = ease(liftStart, liftStart + 40, frame);
+      plate.position.y = mix(0.81, 2.40, lift);
+      plate.rotation.y = 0.11 * (index - 1) * lift;
+      const plateTop = plate.position.y + 0.56;
+      hanger.scale.y = 3.34 - plateTop;
+      hanger.position.y = (3.34 + plateTop) / 2;
     });
-    const focus = pose(camera, [-7, 8.6, 17.2], [-4.9, 7.15, 14.8], [0, 2.06, -0.78], ease(0.87, 1, p));
+    const stamp = ease(platingTiming.stamp, platingTiming.stamp + 17, frame);
+    stampRing.material.opacity = 0.88 * stamp;
+    const move = ease(platingTiming.copies, platingTiming.stamp + 20, frame);
+    const focus = pose(camera, [-7, 8.6, 17.2], [-3.9, 7.05, 14.8], [0, 2.06, -0.78], move);
+    focus.x = 0.24 * stamp;
     return {focus};
   };
 }

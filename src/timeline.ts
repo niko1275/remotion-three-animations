@@ -2,6 +2,8 @@ export const VINYL_FPS = 30;
 export const VINYL_WIDTH = 1080;
 export const VINYL_HEIGHT = 1920;
 
+export const platingTiming = {duration: 330, separate: 68, copies: 174, stamp: 270} as const;
+
 type Cue = {readonly atFrame: number; readonly text: string};
 
 type SceneDefinition = {
@@ -99,27 +101,29 @@ export const vinylScenes = [
   },
   {
     id: 'galvanoplastia',
-    title: 'El relieve se invierte',
-    durationInFrames: 330,
-    narration: 'Cubrimos el disco con metal. Al separar esa capa… cada hueco deja una línea que sobresale.',
+    title: 'De la copia al sello',
+    durationInFrames: platingTiming.duration,
+    narration: 'El metal copia los huecos como marcas que sobresalen. De esa copia sale el sello.',
     voiceLead: 9,
     voiceTail: 21,
     screenText: [
       {atFrame: 22, text: 'Una capa de metal'},
-      {atFrame: 160, text: 'La copia sobresale'},
-      {atFrame: 287, text: ''},
+      {atFrame: 101, text: 'El hueco deja una marca'},
+      {atFrame: platingTiming.copies, text: 'De la copia al sello'},
+      {atFrame: platingTiming.stamp, text: 'Sello para el vinilo'},
     ],
     visual: 'Laca plateada en baño de níquel. Tres piezas muestran la secuencia negativo, positivo y negativo.',
     camera: 'Vista de la cuba. Repetir el encuadre del surco al separar la primera pieza.',
     animation: [
       {atFrame: 0, text: 'Sumergir la laca conductora y mostrar cómo se forma la capa de níquel.'},
-      {atFrame: 126, text: 'Separar la cresta de metal del hueco de laca en el mismo encuadre.'},
-      {atFrame: 287, text: 'Mostrar las copias de metal sobre el tanque.'},
+      {atFrame: platingTiming.separate, text: 'Separar la cresta de metal del hueco de laca en el mismo encuadre.'},
+      {atFrame: platingTiming.copies, text: 'Levantar las tres copias de metal de izquierda a derecha.'},
+      {atFrame: platingTiming.stamp, text: 'Destacar la última pieza. Es el sello que entra a la prensa.'},
     ],
     transition: 'Corte del molde definitivo al mismo molde montado en la prensa.',
     sound: [
       {atFrame: 20, text: 'Agua breve al entrar al baño.'},
-      {atFrame: 126, text: 'Pausa musical durante la primera separación.'},
+      {atFrame: platingTiming.separate, text: 'Pausa musical durante la primera separación.'},
     ],
   },
   {

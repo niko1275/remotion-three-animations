@@ -1,3 +1,5 @@
+import {EfectoPeltzman, peltzmanDefaults} from './scenes/efecto-peltzman/EfectoPeltzman';
+import {duration as peltzmanFrames, fps as peltzmanFps} from './scenes/efecto-peltzman/timeline';
 import {CerebroTramposoNarrado, narrationMetadata} from './voice/NarratedShort';
 import {narrationSourceFrames} from './voice/narration';
 import {LaAcusacionVoces, PruebaLoopVoces, loopVoiceFrames, voiceMetadata, voicePreviewDefaults} from './voice/preview';
@@ -30,6 +32,7 @@ export const Root = () => <>
     <Composition id="GraphicPortrait" component={GraphicCharacterStudy} durationInFrames={120} fps={30} width={1080} height={1440} defaultProps={{view:'face' as const,expression:'worried' as const}}/>
   </Folder>
   <Folder name="Shorts">
+    <Composition id="EfectoPeltzman" component={EfectoPeltzman} durationInFrames={peltzmanFrames} fps={peltzmanFps} width={1080} height={1920} defaultProps={peltzmanDefaults}/>
     <Composition id="LaAcusacion" component={LaAcusacion} durationInFrames={accusationFrames} fps={accusationFps} width={540} height={960}/>
     <Composition id="ElExperimento" component={ElExperimento} durationInFrames={experimentFrames} fps={experimentFps} width={1080} height={1920}/>
     <Composition id="LaTrampa" component={LaTrampa} durationInFrames={trapFrames} fps={trapFps} width={1080} height={1920}/>

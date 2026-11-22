@@ -195,7 +195,7 @@ export function createAntStage(canvas: HTMLCanvasElement, width: number, height:
         if (entrance > 0) walking(i + 1, path, 0.40 + 0.54 * entrance, t, 0.91);
       });
       const pull = smooth(p, 0.35, 0.98);
-      shoot(t, [0.03, 0.31, 0.18], 4.50 + 5.30 * pull, 0.17, 0.60 + 0.34 * pull, 1.15);
+      shoot(t, [-0.18 + 0.21 * pull, 0.29, 0.18], 5.4 + 4.4 * pull, 0.14, 0.72 + 0.22 * pull, 1.15);
       return;
     }
 
@@ -204,7 +204,7 @@ export function createAntStage(canvas: HTMLCanvasElement, width: number, height:
       actors[0].pose(-0.74, floor, 0.08, 1.42, t, 0.03);
       actors[1].pose(1.24 - 0.47 * near, floor, 0.20, -1.60, t, 0.66 * (1 - near));
       mist(t, smooth(p, 0.11, 0.28) * (1 - 0.17 * smooth(p, 0.86, 1)), 0.02, 0.20, 0.70);
-      shoot(t, [0.02, 0.42, 0.20], 7.3 - 1.62 * smooth(p, 0.07, 0.94), 0.01, 0.64, 1.16);
+      shoot(t, [0.20 - 0.18 * near, 0.36, 0.16], 9.9 - 1.06 * smooth(p, 0.07, 0.94), 0.04, 0.84, 1.16);
       return;
     }
 
@@ -216,7 +216,8 @@ export function createAntStage(canvas: HTMLCanvasElement, width: number, height:
         const a = smooth(p, 0.15 + i * 0.055, 0.80 + i * 0.041);
         walking(i + 1, path, 0.12 + a * 0.86, t, 0.94 * (1 - smooth(a, 0.86, 1)));
       });
-      shoot(t, [0, 0.28, 0.18], 13.8 - 1.2 * smooth(p, 0.15, 0.95), 0.11, 1.05, 1.13);
+      const reveal = smooth(p, 0.12, 0.62);
+      shoot(t, [0, 0.25, 0.18], 10.9 + 2.10 * reveal, 0.11, 1.13 + 0.04 * reveal, 1.13);
       return;
     }
 

@@ -1,4 +1,6 @@
 import {ViniloCompleto} from './compositions/ViniloCompleto';
+import {HormigasCompleto, antDefaultProps, calculateAntMetadata} from './scenes/hormigas/HormigasCompleto';
+import {antTimeline} from './scenes/hormigas/timeline';
 import {CuatroTintasApertura, CuatroTintasCompleto} from './scenes/cuatro-tintas/CuatroTintasApertura';
 import {printFullFrames, printLoopFrames, printOpeningFrames} from './scenes/cuatro-tintas/timeline';
 import {openingDurationInFrames, ViniloEscena1} from './scenes/vinilo-apertura/ViniloEscena1';
@@ -20,6 +22,7 @@ export const Root = () => <>
     <Composition id="GraphicPortrait" component={GraphicCharacterStudy} durationInFrames={120} fps={30} width={1080} height={1440} defaultProps={{view:'face' as const,expression:'worried' as const}}/>
   </Folder>
   <Folder name="Shorts">
+    <Composition id="HormigasCompleto" component={HormigasCompleto} durationInFrames={antTimeline.durationInFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT} defaultProps={antDefaultProps} calculateMetadata={calculateAntMetadata}/>
     <Composition id="CuatroTintasApertura" component={CuatroTintasApertura} durationInFrames={printOpeningFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT}/>
     <Composition id="CuatroTintasBucle" component={CuatroTintasApertura} durationInFrames={printLoopFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT}/>
     <Composition id="CuatroTintasCompleto" component={CuatroTintasCompleto} durationInFrames={printFullFrames} fps={VINYL_FPS} width={VINYL_WIDTH} height={VINYL_HEIGHT} defaultProps={{voiceFiles:{}}}/>

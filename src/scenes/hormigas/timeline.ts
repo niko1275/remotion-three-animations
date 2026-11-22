@@ -2,9 +2,9 @@ import {VINYL_FPS} from '../../timeline';
 
 const takes = [
   {
-    id: 'gancho', seconds: 3,
-    narration: '¿Matas una hormiga y, de pronto, aparecen más? No es que estén buscando venganza.',
-    labels: [[0, '¿Por qué llegan más?']],
+    id: 'gancho', seconds: 5,
+    narration: 'Aplastaste una hormiga. ¿Por qué llegan más?',
+    labels: [[0.66, '¿Por qué llegan más?']],
   },
   {
     id: 'senales', seconds: 9,
@@ -32,17 +32,16 @@ export type AntTakeId = (typeof takes)[number]['id'];
 export type AntVoiceFiles = Partial<Record<AntTakeId, string>>;
 export type AntVoiceDurations = Partial<Record<AntTakeId, number>>;
 
-export const antVoiceLead = 4;
-
 export function buildAntTimeline(durations: AntVoiceDurations = {}) {
   let next = 0;
   const scenes = takes.map((take) => {
     const from = next;
     const audioSeconds = durations[take.id];
     const voiceFrames = audioSeconds === undefined ? 0 : Math.ceil(audioSeconds * VINYL_FPS);
-    const duration = Math.max(take.seconds * VINYL_FPS, voiceFrames + antVoiceLead + 8);
+    const voiceLead = take.id === 'gancho' ? Math.round(1.9 * VINYL_FPS) : 4;
+    const duration = Math.max(take.seconds * VINYL_FPS, voiceLead + voiceFrames + 8);
     next += duration;
-    return {...take, from, duration, end: next, voiceFrames};
+    return {...take, from, duration, end: next, voiceLead, voiceFrames};
   });
   return {scenes, durationInFrames: next};
 }

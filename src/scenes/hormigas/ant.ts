@@ -36,7 +36,6 @@ export function buildAnt(parent: Group, m: VinylMaterials, scale: number) {
   parent.add(root);
   const ant = new Group();
   root.add(ant);
-  ant.scale.setScalar(scale);
 
   const contact = m.contact.clone();
   contact.uniforms.span.value = new Vector2(0.66 * scale, 1.52 * scale);
@@ -105,10 +104,11 @@ export function buildAnt(parent: Group, m: VinylMaterials, scale: number) {
     mesh.quaternion.setFromUnitVectors(up, axis.normalize());
   }
 
-  function pose(x: number, y: number, z: number, heading: number, t: number, stride: number, rest = 0) {
+  function pose(x: number, y: number, z: number, heading: number, t: number, stride: number, {rest = 0, squash = 0} = {}) {
     root.visible = true;
     root.position.set(x, y, z);
     root.rotation.y = heading;
+    ant.scale.set(scale * (1 + squash * 0.32), scale * (1 - squash * 0.88), scale * (1 + squash * 0.10));
     const sway = Math.sin(t * 17) * 0.012 * stride;
     body.position.y = sway - rest * 0.075;
     body.rotation.z = -rest * 0.27;
@@ -128,7 +128,7 @@ export function buildAnt(parent: Group, m: VinylMaterials, scale: number) {
     });
 
     antennae.forEach(({side, base, tip}) => {
-      const scan = Math.sin(t * 6.1 + side * 0.96) * 0.051 * (1 - rest);
+      const scan = Math.sin(t * 6.1 + side * 0.96) * 0.051 * (1 - rest) * (1 - squash);
       start.set(side * 0.067, 0.372, 0.438);
       bend.set(side * (0.344 + scan - 0.051 * rest), 0.410, 0.561 + scan * 0.39);
       end.set(side * (0.265 + scan * 1.32 - 0.066 * rest), 0.443 - rest * 0.108, 0.846 - 0.095 * rest);

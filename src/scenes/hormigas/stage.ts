@@ -41,13 +41,17 @@ function makeSet(room: Group, m: VinylMaterials) {
 function makeShoe(room: Group, m: VinylMaterials) {
   const shoe = new Group();
   room.add(shoe);
-  m.block(shoe, [1.42, 0.16, 2.31], [0, 0.15, 0.01], '#B28D64', 0.13);
-  m.block(shoe, [1.35, 0.115, 2.18], [0, 0.27, 0.01], '#D2BA96', 0.075, false);
-  const upper = m.model(shoe, new SphereGeometry(1, 22, 16), '#647C72', [0, 0.43, -0.16], true);
-  upper.scale.set(0.67, 0.43, 0.91);
-  const opening = m.model(shoe, new SphereGeometry(1, 20, 12), '#354642', [0, 0.704, 0.36]);
-  opening.scale.set(0.40, 0.13, 0.43);
-  m.block(shoe, [0.32, 0.032, 0.17], [0, 0.767, -0.43], '#C9AD7E', 0.014, false);
+  m.block(shoe, [1.46, 0.17, 2.32], [0, 0.085, 0], '#3B332C', 0.07);
+  m.block(shoe, [1.45, 0.118, 2.28], [0, 0.202, 0], '#D4BA93', 0.05, false);
+  const upper = m.model(shoe, new SphereGeometry(1, 24, 18), '#647C72', [0, 0.40, 0.02], true);
+  upper.scale.set(0.695, 0.36, 1.08);
+  m.block(shoe, [1.06, 0.69, 0.94], [0, 0.64, -0.51], '#5F756B', 0.22);
+  m.block(shoe, [0.91, 2.3, 0.83], [0, 2.02, -0.56], '#4A5560', 0.18);
+  m.block(shoe, [0.99, 0.19, 0.92], [0, 1.02, -0.56], '#54616C', 0.06);
+  for (let i = 0; i < 4; i++) {
+    const lace = m.block(shoe, [0.62 - i * 0.03, 0.043, 0.068], [0, 0.757 - i * 0.019, 0.04 + i * 0.16], '#EEE0C5', 0.017, false);
+    lace.rotation.y = i % 2 === 0 ? 0.22 : -0.22;
+  }
   shoe.traverse((part) => {part.castShadow = false;});
   return shoe;
 }
@@ -179,23 +183,29 @@ export function createAntStage(canvas: HTMLCanvasElement, width: number, height:
     food.visible = false;
 
     if (id === 'gancho') {
-      const hit = smooth(p, 0.18, 0.37);
-      const lift = smooth(p, 0.42, 0.64);
-      const level = 0.087 + 2.4 * (1 - hit) + 2.1 * lift;
-      shoe.visible = p >= 0.14 && p <= 0.68;
-      shoe.position.set(-0.36 - 0.35 * lift, level, 0.19);
-      shoe.rotation.set(0.05 * (1 - hit), -0.21, -0.08 * lift);
-      shoeContact.visible = hit > 0 && lift < 1;
-      shoeContact.position.set(-0.30, floor + 0.004, 0.18);
-      shoeContact.material.opacity = hit * (1 - lift) * 0.19;
-      const still = smooth(p, 0.36, 0.44);
-      actors[0].pose(-0.23 + 0.23 * smooth(p, 0, 0.35), floor, 0.19, 1.03, t, 1 - still, still);
+      const descent = smooth(p, 0.09, 0.205);
+      const clearance = 2.45 * (1 - descent);
+      const lift = smooth(p, 0.244, 0.395);
+      shoe.visible = p >= 0.08 && p < 0.395;
+      shoe.position.set(-0.09 - 2.14 * lift, floor + clearance + 1.84 * lift, 0.19 - 0.66 * lift);
+      shoe.rotation.set(-0.04 * (1 - descent) - 0.16 * lift, 0.28, 0.07 * lift);
+      shoeContact.visible = shoe.visible;
+      shoeContact.position.set(shoe.position.x, floor + 0.004, shoe.position.z);
+      shoeContact.material.opacity = descent * (1 - lift) * 0.31;
+
+      // Compare the closing sole to the standing ant's height. Lifting the shoe leaves the body flat.
+      const squash = 1 - smooth(clearance, 0.052, 0.42);
+      const stop = smooth(p, 0.145, 0.185);
+      actors[0].pose(-0.27 + 0.30 * smooth(p, 0, 0.182), floor, 0.19, 1.03, t, 1 - stop, {squash});
+
       alarmPaths.slice(0, 3).forEach((path, i) => {
-        const entrance = smooth(p, 0.48 + i * 0.035, 0.98);
-        if (entrance > 0) walking(i + 1, path, 0.40 + 0.54 * entrance, t, 0.91);
+        const entrance = smooth(p, 0.66 + i * 0.039, 0.98);
+        if (entrance > 0) walking(i + 1, path, 0.12 + 0.82 * entrance, t, 0.91 * (1 - smooth(entrance, 0.87, 1)));
       });
-      const pull = smooth(p, 0.35, 0.98);
-      shoot(t, [-0.18 + 0.21 * pull, 0.29, 0.18], 5.4 + 4.4 * pull, 0.14, 0.72 + 0.22 * pull, 1.15);
+      const reveal = smooth(p, 0.32, 0.45);
+      const pull = smooth(p, 0.63, 0.98);
+      shoot(t, [-0.16 + 0.19 * reveal, 0.27 - 0.073 * reveal, 0.18], 6.25 - 0.55 * reveal + 4.70 * pull,
+        0.16, 0.70 + 0.11 * reveal + 0.19 * pull, 1.15);
       return;
     }
 
@@ -209,7 +219,7 @@ export function createAntStage(canvas: HTMLCanvasElement, width: number, height:
     }
 
     if (id === 'alarma') {
-      actors[0].pose(0, floor, 0.19, 1.05, t, 0, 0.91);
+      actors[0].pose(0, floor, 0.19, 1.05, t, 0, {rest: 0.91});
       const show = smooth(p, 0.09, 0.29);
       radiation(t, show, 0.02, 0.20, 2.62);
       alarmPaths.forEach((path, i) => {
@@ -234,7 +244,7 @@ export function createAntStage(canvas: HTMLCanvasElement, width: number, height:
     }
 
     const compare = smooth(p, 0, 0.18);
-    actors[0].pose(-0.03, floor, -1.42, 0.86, t, 0, 0.91);
+    actors[0].pose(-0.03, floor, -1.42, 0.86, t, 0, {rest: 0.91});
     walking(1, alarmPaths[0], 0.72 + 0.24 * compare, t, 0.42 * (1 - compare), -1.62);
     walking(2, alarmPaths[2], 0.72 + 0.24 * compare, t, 0.42 * (1 - compare), -1.62);
     radiation(t, 0.86, -0.04, -1.41, 1.52);

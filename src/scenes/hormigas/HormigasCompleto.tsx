@@ -11,7 +11,7 @@ import {
 import '@fontsource/space-grotesk/latin-700.css';
 import {readVoiceDuration} from '../../compositions/ViniloAnimatico';
 import {createAntStage} from './stage';
-import {antTimeline, antVoiceLead, buildAntTimeline, type AntVoiceDurations, type AntVoiceFiles} from './timeline';
+import {antTimeline, buildAntTimeline, type AntVoiceDurations, type AntVoiceFiles} from './timeline';
 
 type AntAudioProps = {voiceFiles: AntVoiceFiles; voiceDurations: AntVoiceDurations};
 
@@ -33,7 +33,8 @@ export function HormigasCompleto({voiceFiles, voiceDurations}: AntAudioProps) {
   const stage = useRef<ReturnType<typeof createAntStage> | null>(null);
   const {scenes} = useMemo(() => buildAntTimeline(voiceDurations), [voiceDurations]);
   const take = scenes.find((scene) => frame < scene.end) ?? scenes[scenes.length - 1];
-  const progress = (frame - take.from) / (take.duration - 1);
+  const visualFrames = take.id === 'gancho' ? take.seconds * fps : take.duration;
+  const progress = Math.min(1, (frame - take.from) / (visualFrames - 1));
   const labels: readonly (readonly [number, string])[] = take.labels;
   const label = labels.reduce<string | null>((current, [at, text]) => progress >= at ? text : current, null);
 
@@ -59,10 +60,10 @@ export function HormigasCompleto({voiceFiles, voiceDurations}: AntAudioProps) {
         WebkitTextStroke: `${width * 4 / 1080}px #1B1714`, paintOrder: 'stroke fill',
         textShadow: `0 ${width * 4 / 1080}px ${width * 10 / 1080}px #1B171499`,
       }}>{label}</div>}
-      {scenes.map(({id, from, voiceFrames}) => {
+      {scenes.map(({id, from, voiceLead, voiceFrames}) => {
         const path = voiceFiles[id];
         return path && voiceFrames > 0 && (
-          <Sequence key={id} name={id} from={from + antVoiceLead} durationInFrames={voiceFrames} layout="none">
+          <Sequence key={id} name={id} from={from + voiceLead} durationInFrames={voiceFrames} layout="none">
             <Html5Audio src={staticFile(path)} />
           </Sequence>
         );

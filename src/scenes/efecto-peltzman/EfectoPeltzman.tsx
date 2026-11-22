@@ -34,7 +34,7 @@ export function EfectoPeltzman({narratorAudio, subtitles, effectsVolume}: typeof
   return <AbsoluteFill style={{backgroundColor:'#202629', overflow:'hidden'}}>
     {views.map((state, i) => <div key={i} style={{position:'absolute', top:i*panelHeight, left:0,
       width, height:panelHeight, overflow:'hidden', borderTop:i?'2px solid #282420':undefined}}>
-      <Drive width={width} height={panelHeight} state={state}/>
+      <Drive width={width} height={panelHeight} state={state} time={t}/>
     </div>)}
     <FocoGrain/>
     {rewind && <AbsoluteFill style={{opacity:.22*(1-ease(t,14.2,15.3)), background:'#e1a851'}}/>}

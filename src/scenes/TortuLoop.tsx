@@ -61,6 +61,27 @@ const Caption: React.FC<{text: string; durationInFrames: number}> = ({
   );
 };
 
+const BreezeLeaf: React.FC<{style: CSSProperties; color: string}> = ({
+  style,
+  color,
+}) => (
+  <svg viewBox="0 0 48 48" style={style} aria-hidden="true">
+    <path
+      d="M24 3 C20 11 12 14 5 16 C9 22 15 23 20 21 C16 28 18 36 24 43 C29 36 30 28 27 21 C33 23 39 20 43 14 C36 12 29 10 25 3 Z"
+      fill={color}
+      opacity={0.82}
+    />
+    <path
+      d="M24 40 C24 29 23 17 24 5 M24 25 L14 17 M25 29 L34 19"
+      fill="none"
+      stroke="#66513d"
+      strokeWidth={1.2}
+      strokeLinecap="round"
+      opacity={0.48}
+    />
+  </svg>
+);
+
 export const TortuLoop: React.FC = () => {
   const frame = useCurrentFrame();
   const phase = (2 * Math.PI * frame) / (DURATION - 1);
@@ -68,6 +89,18 @@ export const TortuLoop: React.FC = () => {
   const scale = 1 + 0.012 * breath;
   const lift = 3 * breath;
   const legSwing = Math.sin(phase) * 1.2;
+  const leafStyle = (x: number, y: number, offset: number): CSSProperties => {
+    const drift = phase + offset;
+    return {
+      position: 'absolute',
+      left: `calc(${x}% + ${Math.sin(drift) * 10}px)`,
+      top: `calc(${y}% + ${Math.cos(drift) * 8}px)`,
+      width: 23,
+      height: 27,
+      opacity: 0.72,
+      transform: `rotate(${Math.sin(drift) * 14}deg)`,
+    };
+  };
 
   const turtleFrameStyle: CSSProperties = {
     position: 'absolute',
@@ -137,6 +170,9 @@ export const TortuLoop: React.FC = () => {
         src={staticFile('tortu/landscape.jpg')}
         style={{position: 'absolute', width: '100%', height: '100%', objectFit: 'cover'}}
       />
+      <BreezeLeaf style={leafStyle(13, 27, 0)} color="#c98944" />
+      <BreezeLeaf style={leafStyle(84, 38, 2.1)} color="#9b9a52" />
+      <BreezeLeaf style={leafStyle(20, 58, 4.2)} color="#d2a552" />
       <div style={shadowStyle} />
       <div style={turtleFrameStyle}>
         <Img src={staticFile('tortu/tortu.png')} style={turtleBodyStyle} />

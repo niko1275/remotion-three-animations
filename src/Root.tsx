@@ -7,6 +7,7 @@ import {Orbit} from './Orbit';
 import {Hospital} from './scenes/Hospital';
 import {Workshop} from './scenes/Workshop';
 import {TortuLoop} from './scenes/TortuLoop';
+import {TortuThree} from './scenes/TortuThree';
 export const Root = () => <>
   <Folder name="GraphicNovel">
     <Composition id="GraphicProtagonist" component={GraphicCharacterStudy} durationInFrames={120} fps={30} width={1080} height={1440} defaultProps={{view:'body' as const,expression:'neutral' as const}}/>
@@ -17,6 +18,7 @@ export const Root = () => <>
     <Composition id="HospitalStory" component={StoryShort} durationInFrames={450} fps={30} width={1080} height={1920} defaultProps={{lighting:'night' as const}}/>
     <Composition id="ProtagonistActions" component={CharacterShowcase} durationInFrames={720} fps={30} width={1080} height={1920}/>
     <Composition id="TortuLoop" component={TortuLoop} durationInFrames={450} fps={30} width={1080} height={1920}/>
+    <Composition id="TortuThree" component={TortuThree} durationInFrames={450} fps={30} width={1080} height={1920}/>
   </Folder>
   <Folder name="Dioramas">
     <Composition id="Hospital" component={Hospital} durationInFrames={240} fps={30} width={1280} height={960}/>
